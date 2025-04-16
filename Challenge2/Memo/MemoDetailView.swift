@@ -20,9 +20,9 @@ struct MemoDetailView: View {
     
     private var currentAlignment: TextAlignment {
             switch memo.textAlignment {
-            case 1: return .leading
-            case 2: return .center
-            default: return .trailing
+            case 1: return .center
+            case 2: return .trailing
+            default: return .leading
             }
         }
     
@@ -85,10 +85,20 @@ struct MemoDetailView: View {
                     .popover(isPresented: $isShowingAlignmentPopover, arrowEdge: .bottom) {
                         HStack {
                             Button(action: {
-                                memo.textAlignment = 1
+                                memo.textAlignment = 3
                                 isShowingAlignmentPopover = false
                             }) {
                                 Image(systemName: "text.alignleft")
+                                    .font(.title2)
+                                    .foregroundColor(memo.textAlignment == 3 ? .blue : .primary)
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
+                            }
+                            Button(action: {
+                                memo.textAlignment = 1
+                                isShowingAlignmentPopover = false
+                            }) {
+                                Image(systemName: "text.aligncenter")
                                     .font(.title2)
                                     .foregroundColor(memo.textAlignment == 1 ? .blue : .primary)
                                     .frame(width: 44, height: 44)
@@ -98,19 +108,9 @@ struct MemoDetailView: View {
                                 memo.textAlignment = 2
                                 isShowingAlignmentPopover = false
                             }) {
-                                Image(systemName: "text.aligncenter")
-                                    .font(.title2)
-                                    .foregroundColor(memo.textAlignment == 2 ? .blue : .primary)
-                                    .frame(width: 44, height: 44)
-                                    .contentShape(Rectangle())
-                            }
-                            Button(action: {
-                                memo.textAlignment = 3
-                                isShowingAlignmentPopover = false
-                            }) {
                                 Image(systemName: "text.alignright")
                                     .font(.title2)
-                                    .foregroundColor(memo.textAlignment == 3 ? .blue : .primary)
+                                    .foregroundColor(memo.textAlignment == 2 ? .blue : .primary)
                                     .frame(width: 44, height: 44)
                                     .contentShape(Rectangle())
                             }
