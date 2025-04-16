@@ -62,30 +62,34 @@ struct ContentView: View {
                     NewMemoView()
                 }
                 .confirmationDialog(
-                    "이 메모를 삭제하시겠습니까?",
+                    "Are you sure you want to delete this note?",
                     isPresented: $showingDeleteConfirm,
                     titleVisibility: .visible
                 ) {
-                    Button("삭제", role: .destructive) {
+                    Button("Delete", role: .destructive) {
                         if let memo = memoToDelete {
                             deleteMemo(memo)
                         }
                     }
-                    Button("취소", role: .cancel) {}
+                    Button("Cancel", role: .cancel) {}
                 }
                 .toolbar {
                     ToolbarItemGroup(placement: .bottomBar) {
                         HStack {
+                            Rectangle()
+                                .fill(Color.white)
+                                .frame(width: 44, height: 44)
+                            Spacer()
                             Text("\(filteredMemos.count) reflections")
                                 .font(.system(size: 15, weight: .light))
-                                
+                            Spacer()
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                 isAddingNewMemo = true
                             }) {
                                 Image(systemName: "square.and.pencil")
                                     .font(.title3.weight(.semibold))
-                                    .frame(width: 44, height: 44)
+                                    .frame(height: 44)
                                     .background(Color.white)
                                     .foregroundColor(.blue)
                             }
