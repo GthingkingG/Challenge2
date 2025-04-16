@@ -18,7 +18,7 @@ struct NewMemoView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                TextField("제목", text: $title)
+                TextField("Title", text: $title)
                     .font(.largeTitle.bold())
                     .padding()
                 
@@ -28,17 +28,17 @@ struct NewMemoView: View {
                 
                 Spacer()
             }
-            .navigationTitle("새 메모")
+            .navigationTitle("New Reflection")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("취소") {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("저장") {
+                    Button("Add") {
                         saveMemo()
                     }
                     .disabled(title.isEmpty && content.isEmpty)
@@ -51,7 +51,7 @@ struct NewMemoView: View {
         let now = Date()
         // 제목이 비어있으면 내용의 첫 부분을 제목으로 사용
         let finalTitle = title.isEmpty ?
-            (content.isEmpty ? "새 메모" : String(content.prefix(20))) :
+            (content.isEmpty ? "New Reflection" : String(content.prefix(20))) :
             title
             
         let newMemo = Memo(title: finalTitle, content: content, createdAt: now, modifiedAt: now)

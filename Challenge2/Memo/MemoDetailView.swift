@@ -18,7 +18,7 @@ struct MemoDetailView: View {
     var body: some View {
         VStack {
             if isEditing {
-                TextField("제목", text: $memo.title)
+                TextField("Title", text: $memo.title)
                     .font(.largeTitle.bold())
                     .padding(.horizontal)
                 
@@ -27,7 +27,7 @@ struct MemoDetailView: View {
                     .padding(.horizontal)
             } else {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 12) {
                         Text(memo.title)
                             .font(.largeTitle.bold())
                             .padding(.horizontal)
@@ -46,12 +46,12 @@ struct MemoDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 if isEditing {
-                    Button("완료") {
+                    Button("Done") {
                         memo.modifiedAt = Date()
                         isEditing = false
                     }
                 } else {
-                    Button("편집") {
+                    Button("Edit") {
                         isEditing = true
                     }
                 }
@@ -59,7 +59,7 @@ struct MemoDetailView: View {
             
             if isEditing {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("취소") {
+                    Button("Cancel") {
                         isEditing = false
                     }
                 }
@@ -70,11 +70,11 @@ struct MemoDetailView: View {
                     Button(role: .destructive, action: {
                         showingDeleteConfirm = true
                     }) {
-                        Label("삭제", systemImage: "trash")
+                        Label("Delete", systemImage: "trash")
                     }
                     
                     Button(action: shareMemo) {
-                        Label("공유", systemImage: "square.and.arrow.up")
+                        Label("Upload", systemImage: "square.and.arrow.up")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
@@ -82,14 +82,14 @@ struct MemoDetailView: View {
             }
         }
         .confirmationDialog(
-            "이 메모를 삭제하시겠습니까?",
+            "Are you sure you want to delete this note?",
             isPresented: $showingDeleteConfirm,
             titleVisibility: .visible
         ) {
-            Button("삭제", role: .destructive) {
+            Button("Delete", role: .destructive) {
                 deleteMemo()
             }
-            Button("취소", role: .cancel) {}
+            Button("Cancel", role: .cancel) {}
         }
     }
     

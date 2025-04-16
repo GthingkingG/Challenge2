@@ -35,11 +35,11 @@ struct ContentView: View {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(memo.title)
-                                        .font(.system(size: 17))
+                                        .font(.system(size: 17, weight: .regular))
                                         .lineLimit(1)
                                     
                                     Text(formatDate(memo.modifiedAt))
-                                        .font(.caption)
+                                        .font(.system(size: 15, weight: .regular))
                                         .foregroundColor(.gray)
                                 }
                                 .padding(.vertical, 4)
@@ -120,12 +120,12 @@ struct ContentView: View {
     let container = try! ModelContainer(for: Memo.self, configurations: config)
     
     // 샘플 데이터 추가
-    let sampleMemo1 = Memo(title: "쇼핑 목록",
+    let sampleMemo1 = Memo(title: "Apple",
                           content: "1. 우유\n2. 빵\n3. 계란",
                           createdAt: Date().addingTimeInterval(-86400),
                           modifiedAt: Date().addingTimeInterval(-3600))
     
-    let sampleMemo2 = Memo(title: "회의 안건",
+    let sampleMemo2 = Memo(title: "Banana",
                           content: "1. 프로젝트 현황\n2. 다음 마일스톤\n3. 질문 및 토론",
                           createdAt: Date().addingTimeInterval(-172800),
                           modifiedAt: Date().addingTimeInterval(-86400))
