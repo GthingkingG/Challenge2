@@ -53,9 +53,18 @@ struct NewMemoView: View {
         let finalTitle = title.isEmpty ?
             (content.isEmpty ? "New Reflection" : String(content.prefix(20))) :
             title
+        
+        do {
+            let newMemo = Memo(title: finalTitle, content: content, createdAt: now, modifiedAt: now)
             
-        let newMemo = Memo(title: finalTitle, content: content, createdAt: now, modifiedAt: now)
-        modelContext.insert(newMemo)
+            modelContext.insert(newMemo)
+            try modelContext.save()
+        }
+        catch {
+            print("error : \(error.localizedDescription)")
+        }
+            
+        
         dismiss()
     }
 }
