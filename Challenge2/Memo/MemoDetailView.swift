@@ -14,17 +14,31 @@ struct MemoDetailView: View {
     @Bindable var memo: Memo
     @State private var isEditing = false
     @State private var showingDeleteConfirm = false
+    @State private var showingDatePicker = false
+    @State private var isShowingAlignmentPopover = false
+
+    
+    private var currentAlignment: TextAlignment {
+            switch memo.textAlignment {
+            case 1: return .leading
+            case 2: return .center
+            default: return .trailing
+            }
+        }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             if isEditing {
                 TextField("Title", text: $memo.title)
                     .font(.largeTitle.bold())
                     .padding(.horizontal)
+                    .padding(.top)
                 
                 TextEditor(text: $memo.content)
+                    .multilineTextAlignment(currentAlignment)
                     .cornerRadius(8)
                     .padding(.horizontal)
+                    .padding(.bottom, 50)
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
@@ -33,14 +47,97 @@ struct MemoDetailView: View {
                             .padding(.horizontal)
                         
                         Text(memo.content)
+                            .multilineTextAlignment(currentAlignment)
                             .padding(.horizontal)
+                            .padding(.bottom, 50)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical)
                 }
+                
             }
             
-            Spacer()
+            if isEditing {
+                HStack{
+                    //체크박스
+                    Button(action: insertChecklist) {
+                        Image(systemName: "checkmark.square")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                    }
+                    Spacer()
+                    
+                    // 첨부파일 버튼
+                    Button(action: {}) {
+                        Image(systemName: "paperclip")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                    }
+                    Spacer()
+                    // 정렬 선택 메뉴
+                    Button {
+                        isShowingAlignmentPopover = true
+                    } label: {
+                        Image(systemName: "text.alignleft")
+                            .font(.title2)
+                            .foregroundColor(isShowingAlignmentPopover ? .secondary : .blue)
+                    }
+                    .popover(isPresented: $isShowingAlignmentPopover, arrowEdge: .bottom) {
+                        HStack {
+                            Button(action: {
+                                memo.textAlignment = 1
+                                isShowingAlignmentPopover = false
+                            }) {
+                                Image(systemName: "text.alignleft")
+                                    .font(.title2)
+                                    .foregroundColor(memo.textAlignment == 1 ? .blue : .primary)
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
+                            }
+                            Button(action: {
+                                memo.textAlignment = 2
+                                isShowingAlignmentPopover = false
+                            }) {
+                                Image(systemName: "text.aligncenter")
+                                    .font(.title2)
+                                    .foregroundColor(memo.textAlignment == 2 ? .blue : .primary)
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
+                            }
+                            Button(action: {
+                                memo.textAlignment = 3
+                                isShowingAlignmentPopover = false
+                            }) {
+                                Image(systemName: "text.alignright")
+                                    .font(.title2)
+                                    .foregroundColor(memo.textAlignment == 3 ? .blue : .primary)
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
+                            }
+                        }
+                        .padding(12)
+                        .presentationCompactAdaptation(.popover)
+                    }
+                    Spacer()
+                    
+                    // 날짜 설정 버튼
+                    Button(action: { showingDatePicker = true }) {
+                        Image(systemName: "calendar")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                    }
+                }
+                .padding(EdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20))
+                .frame(maxWidth: .infinity)
+                .background(
+                    Rectangle()
+                        .fill(Color(.systemBackground))
+                        .edgesIgnoringSafeArea(.bottom)
+                        .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: -2)
+                )
+                .overlay(Divider(), alignment: .top)
+                
+            }
         }
         .navigationBarBackButtonHidden(isEditing)
         .toolbar {
@@ -56,15 +153,6 @@ struct MemoDetailView: View {
                     }
                 }
             }
-            
-            if isEditing {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        isEditing = false
-                    }
-                }
-            }
-            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
                     Button(role: .destructive, action: {
@@ -91,6 +179,31 @@ struct MemoDetailView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
+        .sheet(isPresented: $showingDatePicker) {
+            DatePicker("날짜 선택",
+                       selection: $memo.modifiedAt,
+                       displayedComponents: [.date, .hourAndMinute]
+            )
+            .datePickerStyle(.graphical)
+            .presentationDetents([.height(400)])
+            .labelsHidden()
+            .padding()
+        }
+    }
+        
+    
+
+    private var alignmentIcon: String {
+            switch memo.textAlignment {
+            case 1: return "text.aligncenter"
+            case 2: return "text.alignright"
+            default: return "text.alignleft"
+            }
+        }
+
+    private func insertChecklist() {
+        memo.content += "\n- [ ] "
+        memo.modifiedAt = Date()
     }
     
     private func deleteMemo() {
@@ -115,9 +228,11 @@ struct MemoDetailView: View {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: Memo.self, configurations: config)
     
-    let sampleMemo = Memo(title: "회의 안건",
-                         content: "1. 프로젝트 현황\n2. 다음 마일스톤\n3. 질문 및 토론")
-    container.mainContext.insert(sampleMemo)
+    let sampleMemo = Memo(
+        title: "회의 안건",
+        content: "1. 프로젝트 현황\n2. 다음 마일스톤",
+        textAlignment: 1
+    )
     
     return NavigationStack {
         MemoDetailView(memo: sampleMemo)
