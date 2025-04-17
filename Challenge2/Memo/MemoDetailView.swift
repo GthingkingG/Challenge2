@@ -34,28 +34,56 @@ struct MemoDetailView: View {
                     .padding(.horizontal)
                     .padding(.top)
                 
+                
                 TextEditor(text: $memo.content)
                     .multilineTextAlignment(currentAlignment)
                     .cornerRadius(8)
                     .padding(.horizontal)
                     .padding(.bottom, 50)
+                
+                List {
+                    ForEach($memo.checkboxes) { $item in
+                        ChecklistItemView(item: $item)
+                    }
+                    .onDelete(perform: deleteChecklistItem)
+                }
+                .listStyle(.plain)
+                .frame(maxHeight: 200)
+                
+                
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(memo.title)
                             .font(.largeTitle.bold())
                             .padding(.horizontal)
-                        
                         Text(memo.content)
                             .multilineTextAlignment(currentAlignment)
                             .padding(.horizontal, 25)
                             .padding(.bottom, 50)
+                        
+                            
+                        
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical)
+                    
                 }
                 
             }
+            
+            if !isEditing && !memo.content.isEmpty {
+                List(memo.checkboxes) { item in
+                    HStack {
+                        Image(systemName: item.isChecked ? "checkmark.square.fill" : "square")
+                            .foregroundColor(item.isChecked ? .blue : .primary)
+                        Text(item.checklistTitle)
+                    }
+                }
+                .listStyle(.plain)
+                .frame(maxHeight: 160)
+            }
+            
             
             if isEditing {
                 HStack{
@@ -200,11 +228,6 @@ struct MemoDetailView: View {
             default: return "text.alignleft"
             }
         }
-
-    private func insertChecklist() {
-        memo.content += "\n- [ ] "
-        memo.modifiedAt = Date()
-    }
     
     private func deleteMemo() {
         modelContext.delete(memo)
@@ -222,19 +245,34 @@ struct MemoDetailView: View {
             rootViewController.present(activityVC, animated: true)
         }
     }
+    
+    private func deleteChecklistItem(at offsets: IndexSet) {
+        memo.checkboxes.remove(atOffsets: offsets)
+        memo.modifiedAt = Date()
+    }
+    
+    private func insertChecklist() {
+        let newItem = ChecklistItem(checklistTitle: "New item")
+        memo.checkboxes.append(newItem)
+        memo.modifiedAt = Date()
+    }
 }
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Memo.self, configurations: config)
+    let container = try! ModelContainer(for: Memo.self, ChecklistItem.self, configurations: config)
     
     let sampleMemo = Memo(
         title: "회의 안건",
-        content: "필요한 회의 안건 목록 \n1. 프로젝트 현황\n2. 다음 마일스톤",
-        textAlignment: 0
+        content: "1. 프로젝트 현황\n2. 다음 마일스톤",
+        textAlignment: 0,
+        checkboxes: [
+            ChecklistItem(checklistTitle: "Task 1", isChecked: true),
+            ChecklistItem(checklistTitle: "Task 2")
+        ]
     )
     
-    return NavigationStack {
+    NavigationStack {
         MemoDetailView(memo: sampleMemo)
     }
     .modelContainer(container)

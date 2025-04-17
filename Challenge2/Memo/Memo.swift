@@ -15,12 +15,26 @@ class Memo {
     var createdAt: Date
     var modifiedAt: Date
     var textAlignment: Int?
+    var checkboxes: [ChecklistItem]
     
-    init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 3) {
+    init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 3, checkboxes: [ChecklistItem] = []) {
         self.title = title
         self.content = content
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
         self.textAlignment = textAlignment
+        self.checkboxes = checkboxes
+    }
+}
+
+@Model
+class ChecklistItem: Identifiable {
+    var id = UUID()
+    var checklistTitle: String
+    var isChecked: Bool
+    
+    init(checklistTitle: String, isChecked: Bool = false) {
+        self.checklistTitle = checklistTitle
+        self.isChecked = isChecked
     }
 }
