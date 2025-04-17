@@ -48,7 +48,7 @@ struct MemoDetailView: View {
                         
                         Text(memo.content)
                             .multilineTextAlignment(currentAlignment)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 25)
                             .padding(.bottom, 50)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -230,7 +230,7 @@ struct MemoDetailView: View {
     
     let sampleMemo = Memo(
         title: "회의 안건",
-        content: "1. 프로젝트 현황\n2. 다음 마일스톤",
+        content: "필요한 회의 안건 목록 \n1. 프로젝트 현황\n2. 다음 마일스톤",
         textAlignment: 0
     )
     
