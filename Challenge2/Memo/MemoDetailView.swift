@@ -231,7 +231,7 @@ struct MemoDetailView: View {
     let sampleMemo = Memo(
         title: "회의 안건",
         content: "1. 프로젝트 현황\n2. 다음 마일스톤",
-        textAlignment: 1
+        textAlignment: 0
     )
     
     return NavigationStack {

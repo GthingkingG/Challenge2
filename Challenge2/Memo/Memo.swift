@@ -16,7 +16,7 @@ class Memo {
     var modifiedAt: Date
     var textAlignment: Int?
     
-    init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 0) {
+    init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 3) {
         self.title = title
         self.content = content
         self.createdAt = createdAt
