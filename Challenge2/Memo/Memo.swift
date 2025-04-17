@@ -17,13 +17,16 @@ class Memo {
     var textAlignment: Int?
     var checkboxes: [ChecklistItem]
     
-    init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 3, checkboxes: [ChecklistItem] = []) {
+    var customDate: Date?
+    
+    init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 3, checkboxes: [ChecklistItem] = [], customDate: Date? = nil) {
         self.title = title
         self.content = content
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
         self.textAlignment = textAlignment
         self.checkboxes = checkboxes
+        self.customDate = customDate
     }
 }
 

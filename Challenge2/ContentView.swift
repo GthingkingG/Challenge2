@@ -10,7 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Memo.modifiedAt, order: .reverse) private var memos: [Memo]
+    @Query(sort: \Memo.customDate, order: .reverse) private var memos: [Memo]
     @State private var searchText = ""
     @State private var isAddingNewMemo = false
     @State private var showingDeleteConfirm = false
@@ -38,7 +38,7 @@ struct ContentView: View {
                                         .font(.system(size: 17, weight: .regular))
                                         .lineLimit(1)
                                     
-                                    Text(formatDate(memo.modifiedAt))
+                                    Text(formatDate(memo.customDate ?? memo.modifiedAt))
                                         .font(.system(size: 15, weight: .regular))
                                         .foregroundColor(.gray)
                                 }
@@ -123,12 +123,14 @@ struct ContentView: View {
     let sampleMemo1 = Memo(title: "Apple",
                           content: "1. 우유\n2. 빵\n3. 계란",
                           createdAt: Date().addingTimeInterval(-86400),
-                          modifiedAt: Date().addingTimeInterval(-3600))
+                          modifiedAt: Date().addingTimeInterval(-3600),
+                           customDate: Date().addingTimeInterval(-3600))
     
     let sampleMemo2 = Memo(title: "Banana",
                           content: "1. 프로젝트 현황\n2. 다음 마일스톤\n3. 질문 및 토론",
                           createdAt: Date().addingTimeInterval(-172800),
-                          modifiedAt: Date().addingTimeInterval(-86400))
+                          modifiedAt: Date().addingTimeInterval(-86400),
+                           customDate: Date().addingTimeInterval(-3600))
     
     container.mainContext.insert(sampleMemo1)
     container.mainContext.insert(sampleMemo2)

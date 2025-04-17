@@ -208,9 +208,13 @@ struct MemoDetailView: View {
             Button("Cancel", role: .cancel) {}
         }
         .sheet(isPresented: $showingDatePicker) {
-            DatePicker("날짜 선택",
-                       selection: $memo.modifiedAt,
-                       displayedComponents: [.date, .hourAndMinute]
+            DatePicker(
+                "날짜 선택",
+                selection: Binding(
+                    get: { memo.customDate ?? Date() },
+                    set: { memo.customDate = $0 }
+                ),
+                displayedComponents: [.date, .hourAndMinute]
             )
             .datePickerStyle(.graphical)
             .presentationDetents([.height(400)])
