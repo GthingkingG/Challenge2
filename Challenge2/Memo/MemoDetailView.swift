@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import _PhotosUI_SwiftUI
 
 struct MemoDetailView: View {
     @Environment(\.modelContext) private var modelContext
@@ -16,6 +17,8 @@ struct MemoDetailView: View {
     @State private var showingDeleteConfirm = false
     @State private var showingDatePicker = false
     @State private var isShowingAlignmentPopover = false
+    @State private var showingAttachmentOptions = false
+    @State private var selectedPhotoItems: [PhotosPickerItem] = []
 
     
     private var currentAlignment: TextAlignment {
@@ -39,8 +42,6 @@ struct MemoDetailView: View {
                     .multilineTextAlignment(currentAlignment)
                     .cornerRadius(8)
                     .padding(.horizontal)
-                    .padding(.bottom, 50)
-                
                 List {
                     ForEach($memo.checkboxes) { $item in
                         ChecklistItemView(item: $item)
@@ -83,6 +84,20 @@ struct MemoDetailView: View {
                 .listStyle(.plain)
                 .frame(maxHeight: 160)
             }
+            if !memo.attachments.isEmpty {
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(memo.attachments) { attachment in
+                            AttachmentThumbnailView(
+                                attachment: attachment,
+                                isEditing: isEditing,
+                                onDelete: { deleteAttachment(attachment) }
+                            )
+                        }
+                    }
+                    .padding()
+                }
+            }
             
             
             if isEditing {
@@ -96,10 +111,58 @@ struct MemoDetailView: View {
                     Spacer()
                     
                     // 첨부파일 버튼
-                    Button(action: {}) {
+                    Button(action: { showingAttachmentOptions = true }) {
                         Image(systemName: "paperclip")
                             .font(.title2)
                             .foregroundColor(.blue)
+                    }
+                    .popover(isPresented: $showingAttachmentOptions) {
+                        VStack(alignment: .leading) {
+                            PhotosPicker(
+                                selection: $selectedPhotoItems,
+                                matching: .images
+                            ) {
+                                HStack {
+                                    Text("Select Image")
+                                    Spacer()
+                                    Image(systemName: "photo.on.rectangle")
+                                }
+                                .font(.system(size: 17, weight: .light))
+                                .foregroundColor(.black)
+                            }
+                            .onChange(of: selectedPhotoItems) {
+                                showingAttachmentOptions = false
+                            }
+                            Divider()
+                            Button{
+                                showingAttachmentOptions = false
+                            } label: {
+                                HStack {
+                                    Text("Attach file")
+                                    Spacer()
+                                    Image(systemName: "doc")
+                                }
+                                .font(.system(size: 17, weight: .light))
+                                .foregroundColor(.secondary)
+                                
+                            }
+                            Divider()
+                            Button {
+                                showingAttachmentOptions = false
+                            } label: {
+                                HStack {
+                                    Text("Record Audio")
+                                    Spacer()
+                                    Image(systemName: "waveform")
+                                }
+                                .font(.system(size: 17, weight: .light))
+                                .foregroundColor(.secondary)
+                            }
+                            
+                        }
+                        .padding(.horizontal)
+                        .presentationCompactAdaptation(.popover)
+                        .frame(width: 240, height: 120)
                     }
                     Spacer()
                     // 정렬 선택 메뉴
@@ -221,6 +284,16 @@ struct MemoDetailView: View {
             .labelsHidden()
             .padding()
         }
+        .onChange(of: selectedPhotoItems) { _, newItems in
+            Task {
+                for item in newItems {
+                    if let data = try? await item.loadTransferable(type: Data.self) {
+                        saveImage(data: data)
+                    }
+                }
+                selectedPhotoItems.removeAll()
+            }
+        }
     }
         
     
@@ -259,6 +332,31 @@ struct MemoDetailView: View {
         let newItem = ChecklistItem(checklistTitle: "New item")
         memo.checkboxes.append(newItem)
         memo.modifiedAt = Date()
+    }
+    
+    private func saveImage(data: Data) {
+        let fileName = "Img_\(UUID().uuidString).jpg"
+        guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) else { return }
+        do {
+            try data.write(to: url)
+            let newAttachment = Attachment(
+                fileName: fileName,
+                fileURL: url.path,
+                type: "image"
+            )
+            memo.attachments.append(newAttachment)
+        } catch {
+            print("이미지 저장 실패: \(error)")
+        }
+    }
+    
+    private func deleteAttachment(_ attachment: Attachment) {
+        let fileURL = URL(fileURLWithPath: attachment.fileURL)
+        try? FileManager.default.removeItem(at: fileURL)
+        
+        if let index = memo.attachments.firstIndex(where: { $0.id == attachment.id }) {
+            memo.attachments.remove(at: index)
+        }
     }
 }
 

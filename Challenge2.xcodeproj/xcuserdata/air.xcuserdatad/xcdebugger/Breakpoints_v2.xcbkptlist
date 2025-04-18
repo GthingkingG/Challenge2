@@ -30,8 +30,10 @@
             filePath = "Challenge2/Memo/MemoDetailView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "295"
-            endingLineNumber = "295">
+            startingLineNumber = "324"
+            endingLineNumber = "324"
+            landmarkName = "MemoDetailView"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

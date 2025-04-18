@@ -19,7 +19,9 @@ class Memo {
     
     var customDate: Date?
     
-    init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 3, checkboxes: [ChecklistItem] = [], customDate: Date? = nil) {
+    var attachments: [Attachment]
+    
+    init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 3, checkboxes: [ChecklistItem] = [], customDate: Date? = nil, attachments: [Attachment] = []) {
         self.title = title
         self.content = content
         self.createdAt = createdAt
@@ -27,6 +29,7 @@ class Memo {
         self.textAlignment = textAlignment
         self.checkboxes = checkboxes
         self.customDate = customDate
+        self.attachments = attachments
     }
 }
 
@@ -39,5 +42,19 @@ class ChecklistItem: Identifiable {
     init(checklistTitle: String, isChecked: Bool = false) {
         self.checklistTitle = checklistTitle
         self.isChecked = isChecked
+    }
+}
+
+@Model
+class Attachment: Identifiable {
+    var id = UUID()
+    var fileName: String
+    var fileURL: String
+    var type: String
+    
+    init(fileName: String, fileURL: String, type: String) {
+        self.fileName = fileName
+        self.fileURL = fileURL
+        self.type = type
     }
 }
