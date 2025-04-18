@@ -30,10 +30,26 @@
             filePath = "Challenge2/Memo/MemoDetailView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "324"
-            endingLineNumber = "324"
-            landmarkName = "MemoDetailView"
-            landmarkType = "14">
+            startingLineNumber = "316"
+            endingLineNumber = "316"
+            landmarkName = "shareMemo()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F37E6366-FFD5-4F89-A57D-B5D43ABEC11E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../var/folders/04/c50r28m12n9_y93vy751tg900000gp/T/swift-generated-sources/@__swiftmacro_10Challenge20025MemoDetailViewswift_jqFBgfMX343_0_33_AB8CFC917D1D7772F8043F427F6D3E74Ll7PreviewfMf_.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1"
+            endingLineNumber = "1"
+            landmarkName = "$s10Challenge20025MemoDetailViewswift_jqFBgfMX343_0_33_AB8CFC917D1D7772F8043F427F6D3E74Ll7PreviewfMf_15PreviewRegistryfMu_"
+            landmarkType = "37">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

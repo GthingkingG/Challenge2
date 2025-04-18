@@ -19,13 +19,13 @@ struct AttachmentThumbnailView: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 100, height: 100)
+                    .frame(width: 200, height: 200)
                     .clipped()
                     .cornerRadius(8)
             } else {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color.gray.opacity(0.3))
-                    .frame(width: 100, height: 100)
+                    .frame(width: 200, height: 200)
                     .overlay(
                         Image(systemName: "questionmark")
                             .font(.largeTitle)

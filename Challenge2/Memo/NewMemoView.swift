@@ -20,7 +20,7 @@ struct NewMemoView: View {
             VStack {
                 TextField("Title", text: $title)
                     .font(.largeTitle.bold())
-                    .padding()
+                    .padding(.horizontal)
                 
                 TextEditor(text: $content)
                     .cornerRadius(8)

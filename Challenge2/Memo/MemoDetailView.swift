@@ -32,36 +32,61 @@ struct MemoDetailView: View {
     var body: some View {
         VStack(spacing: 0) {
             if isEditing {
+                if !memo.attachments.isEmpty {
+                    ScrollView(.horizontal) {
+                        HStack {
+                            ForEach(memo.attachments) { attachment in
+                                AttachmentThumbnailView(
+                                    attachment: attachment,
+                                    isEditing: isEditing,
+                                    onDelete: { deleteAttachment(attachment) }
+                                )
+                            }
+                        }
+                    }
+                }
+                
                 TextField("Title", text: $memo.title)
                     .font(.largeTitle.bold())
                     .padding(.horizontal)
                     .padding(.top)
                 
                 
+                
                 TextEditor(text: $memo.content)
                     .multilineTextAlignment(currentAlignment)
                     .cornerRadius(8)
                     .padding(.horizontal)
-                List {
-                    ForEach($memo.checkboxes) { $item in
-                        ChecklistItemView(item: $item)
-                    }
-                    .onDelete(perform: deleteChecklistItem)
-                }
-                .listStyle(.plain)
-                .frame(maxHeight: 200)
+                
                 
                 
             } else {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading) {
+                        if !memo.attachments.isEmpty {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack {
+                                    ForEach(memo.attachments) { attachment in
+                                        AttachmentThumbnailView(
+                                            attachment: attachment,
+                                            isEditing: isEditing,
+                                            onDelete: { deleteAttachment(attachment) }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
                         Text(memo.title)
                             .font(.largeTitle.bold())
                             .padding(.horizontal)
+                            .padding(.vertical, 8)
+                        
                         Text(memo.content)
                             .multilineTextAlignment(currentAlignment)
-                            .padding(.horizontal, 25)
-                            .padding(.bottom, 50)
+                            .cornerRadius(8)
+                            .padding(.horizontal)
                         
                             
                         
@@ -73,44 +98,11 @@ struct MemoDetailView: View {
                 
             }
             
-            if !isEditing && !memo.content.isEmpty {
-                List(memo.checkboxes) { item in
-                    HStack {
-                        Image(systemName: item.isChecked ? "checkmark.square.fill" : "square")
-                            .foregroundColor(item.isChecked ? .blue : .primary)
-                        Text(item.checklistTitle)
-                    }
-                }
-                .listStyle(.plain)
-                .frame(maxHeight: 160)
-            }
-            if !memo.attachments.isEmpty {
-                ScrollView(.horizontal) {
-                    HStack {
-                        ForEach(memo.attachments) { attachment in
-                            AttachmentThumbnailView(
-                                attachment: attachment,
-                                isEditing: isEditing,
-                                onDelete: { deleteAttachment(attachment) }
-                            )
-                        }
-                    }
-                    .padding()
-                }
-            }
             
             
             if isEditing {
                 HStack{
-                    //체크박스
-                    Button(action: insertChecklist) {
-                        Image(systemName: "checkmark.square")
-                            .font(.title2)
-                            .foregroundColor(.blue)
-                    }
-                    Spacer()
-                    
-                    // 첨부파일 버튼
+                    //이미지 파일 버튼
                     Button(action: { showingAttachmentOptions = true }) {
                         Image(systemName: "paperclip")
                             .font(.title2)
@@ -218,7 +210,7 @@ struct MemoDetailView: View {
                             .foregroundColor(.blue)
                     }
                 }
-                .padding(EdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20))
+                .padding(EdgeInsets(top: 10, leading: 40, bottom: 10, trailing: 40))
                 .frame(maxWidth: .infinity)
                 .background(
                     Rectangle()
@@ -272,7 +264,7 @@ struct MemoDetailView: View {
         }
         .sheet(isPresented: $showingDatePicker) {
             DatePicker(
-                "날짜 선택",
+                "Select Date",
                 selection: Binding(
                     get: { memo.customDate ?? Date() },
                     set: { memo.customDate = $0 }
@@ -323,17 +315,6 @@ struct MemoDetailView: View {
         }
     }
     
-    private func deleteChecklistItem(at offsets: IndexSet) {
-        memo.checkboxes.remove(atOffsets: offsets)
-        memo.modifiedAt = Date()
-    }
-    
-    private func insertChecklist() {
-        let newItem = ChecklistItem(checklistTitle: "New item")
-        memo.checkboxes.append(newItem)
-        memo.modifiedAt = Date()
-    }
-    
     private func saveImage(data: Data) {
         let fileName = "Img_\(UUID().uuidString).jpg"
         guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) else { return }
@@ -361,17 +342,12 @@ struct MemoDetailView: View {
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Memo.self, ChecklistItem.self, configurations: config)
+    let container = try! ModelContainer(for: Memo.self, configurations: .init(isStoredInMemoryOnly: true))
     
     let sampleMemo = Memo(
         title: "회의 안건",
         content: "1. 프로젝트 현황\n2. 다음 마일스톤",
-        textAlignment: 0,
-        checkboxes: [
-            ChecklistItem(checklistTitle: "Task 1", isChecked: true),
-            ChecklistItem(checklistTitle: "Task 2")
-        ]
+        textAlignment: 0
     )
     
     NavigationStack {
@@ -379,3 +355,4 @@ struct MemoDetailView: View {
     }
     .modelContainer(container)
 }
+
