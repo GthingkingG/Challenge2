@@ -96,7 +96,8 @@ struct TextFormattingPanel: View {
                             .font(.title3)
                             .foregroundStyle(.black)
                     }
-                    .frame(width: 44, height: 44)                    .popover(isPresented: $showingColorPicker) {
+                    .frame(width: 44, height: 44)
+                    .popover(isPresented: $showingColorPicker) {
                         VStack(spacing: 10) {
                             ForEach(colors.indices, id: \.self) { index in
                                 Button(action: {
@@ -104,21 +105,22 @@ struct TextFormattingPanel: View {
                                     showingColorPicker = false
                                 }) {
                                     HStack {
+                                        Text(colorNames[index])
+                                        Spacer()
                                         Circle()
                                             .fill(colors[index])
                                             .frame(width: 20, height: 20)
-                                        Text(colorNames[index])
-                                        Spacer()
-                                        if selectedColor == colors[index] {
-                                            Image(systemName: "checkmark")
-                                                .foregroundColor(.blue)
-                                        }
+                                        
                                     }
                                     .padding(.horizontal)
+                                    
                                 }
+                                Divider()
                             }
+                            
                         }
-                        .padding(.vertical)
+                        .presentationCompactAdaptation(.popover)
+                        .frame(width: 250, height: 260)
                     }
                     
                     Divider().frame(height: 24)
