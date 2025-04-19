@@ -30,6 +30,12 @@ struct MemoDetailView: View {
     @State private var isStrikeThrough = false
     @State private var selectedColor: Color = .primary
     @State private var textStyle: Font.TextStyle = .body
+    //날짜헤더
+    @State private var showDateHeader = false
+    @State private var dragOffset = CGSize.zero
+    
+    
+    
     
     
     private var currentAlignment: TextAlignment {
@@ -39,6 +45,9 @@ struct MemoDetailView: View {
         default: return .leading
         }
     }
+    
+    
+    
     
     var body: some View {
         GeometryReader { geometry in
@@ -62,7 +71,7 @@ struct MemoDetailView: View {
                         TextField("Title", text: $memo.title)
                             .font(.largeTitle.bold())
                             .padding(.horizontal)
-                            .padding(.top)
+                            .padding(.top, showDateHeader ? 30 : 0)
                         
                         
                         
@@ -81,43 +90,51 @@ struct MemoDetailView: View {
                     }
                 } else {
                     ScrollView {
-                        VStack(alignment: .leading) {
-                            if !memo.attachments.isEmpty {
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack {
-                                        ForEach(memo.attachments) { attachment in
-                                            AttachmentThumbnailView(
-                                                attachment: attachment,
-                                                isEditing: isEditing,
-                                                onDelete: { deleteAttachment(attachment) }
-                                            )
+                        ZStack(alignment: .top) {
+                            VStack(alignment: .leading) {
+                                if !memo.attachments.isEmpty {
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack {
+                                            ForEach(memo.attachments) { attachment in
+                                                AttachmentThumbnailView(
+                                                    attachment: attachment,
+                                                    isEditing: isEditing,
+                                                    onDelete: { deleteAttachment(attachment) }
+                                                )
+                                            }
                                         }
                                     }
                                 }
+                                
+                                
+                                Text(memo.title)
+                                    .font(.largeTitle.bold())
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 8)
+                                
+                                Text(memo.content)
+                                    .multilineTextAlignment(currentAlignment)
+                                    .font(.system(textStyle))
+                                    .bold(isBold)
+                                    .italic(isItalic)
+                                    .underline(isUnderlined)
+                                    .strikethrough(isStrikeThrough)
+                                    .foregroundStyle(selectedColor)
+                                    .cornerRadius(8)
+                                    .padding(.horizontal)
+                                
+                                
+                                
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical)
+                            .offset(y: dragOffset.height * 0.3)
                             
-                            
-                            Text(memo.title)
-                                .font(.largeTitle.bold())
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                            
-                            Text(memo.content)
-                                .multilineTextAlignment(currentAlignment)
-                                .font(.system(textStyle))
-                                .bold(isBold)
-                                .italic(isItalic)
-                                .underline(isUnderlined)
-                                .strikethrough(isStrikeThrough)
-                                .foregroundStyle(selectedColor)
-                                .cornerRadius(8)
-                                .padding(.horizontal)
-                            
-                            
-                            
+                            if !isEditing {
+                                dateHeader
+                            }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical)
+                        .gesture(dragGesture)
                         
                     }
                     .scrollIndicators(.hidden)
@@ -277,69 +294,69 @@ struct MemoDetailView: View {
         }
         .navigationBarBackButtonHidden(isEditing)
         .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if isEditing {
-                        Button("Done") {
-                            memo.modifiedAt = Date()
-                            showFormattingPanel = false
-                            isEditing = false
-                        }
-                    } else {
-                        Button("Edit") {
-                            isEditing = true
-                        }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if isEditing {
+                    Button("Done") {
+                        memo.modifiedAt = Date()
+                        showFormattingPanel = false
+                        isEditing = false
                     }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button(role: .destructive, action: {
-                            showingDeleteConfirm = true
-                        }) {
-                            Label("Delete", systemImage: "trash")
-                        }
-                        
-                        Button(action: shareMemo) {
-                            Label("Upload", systemImage: "square.and.arrow.up")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
+                } else {
+                    Button("Edit") {
+                        isEditing = true
                     }
                 }
             }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button(role: .destructive, action: {
+                        showingDeleteConfirm = true
+                    }) {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    
+                    Button(action: shareMemo) {
+                        Label("Upload", systemImage: "square.and.arrow.up")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+        }
         .confirmationDialog(
-                "Are you sure you want to delete this note?",
-                isPresented: $showingDeleteConfirm,
-                titleVisibility: .visible
-            ) {
-                Button("Delete", role: .destructive) {
-                    deleteMemo()
-                }
-                Button("Cancel", role: .cancel) {}
+            "Are you sure you want to delete this note?",
+            isPresented: $showingDeleteConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                deleteMemo()
             }
+            Button("Cancel", role: .cancel) {}
+        }
         .sheet(isPresented: $showingDatePicker) {
             DatePicker(
-                    "Select Date",
-                    selection: Binding(
-                        get: { memo.customDate ?? Date() },
-                        set: { memo.customDate = $0 }
-                    ),
-                    displayedComponents: [.date, .hourAndMinute]
-                )
-                .datePickerStyle(.graphical)
-                .presentationDetents([.height(400)])
-                .labelsHidden()
-                .padding()
-            }
+                "Select Date",
+                selection: Binding(
+                    get: { memo.customDate ?? Date() },
+                    set: { memo.customDate = $0 }
+                ),
+                displayedComponents: [.date, .hourAndMinute]
+            )
+            .datePickerStyle(.graphical)
+            .presentationDetents([.height(400)])
+            .labelsHidden()
+            .padding()
+        }
         .onChange(of: selectedPhotoItems) { _, newItems in
-                Task {
-                    for item in newItems {
-                        if let data = try? await item.loadTransferable(type: Data.self) {
-                            saveImage(data: data)
-                        }
+            Task {
+                for item in newItems {
+                    if let data = try? await item.loadTransferable(type: Data.self) {
+                        saveImage(data: data)
                     }
-                    selectedPhotoItems.removeAll()
                 }
+                selectedPhotoItems.removeAll()
             }
+        }
     }
     
     private var alignmentIcon: String {
@@ -405,7 +422,38 @@ struct MemoDetailView: View {
         }
     }
     
+    private var dateHeader: some View {
+        VStack(spacing: 4) {
+            Text(formattedCustomDate)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        }
+        .opacity(showDateHeader ? 1 : 0)
+        .offset(y: showDateHeader ? 0 : -20)
+        .animation(.spring(), value: showDateHeader)
+    }
     
+    private var formattedCustomDate: String {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy.MM.dd"
+            return formatter.string(from: memo.customDate ?? memo.modifiedAt)
+        }
+    
+    private var dragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                guard !isEditing else { return }
+                if value.translation.height > 0 {
+                    dragOffset = value.translation
+                }
+            }
+            .onEnded { value in
+                withAnimation(.spring()) {
+                    showDateHeader = value.translation.height > 50
+                    dragOffset = .zero
+                }
+            }
+    }
 }
 
 #Preview {
