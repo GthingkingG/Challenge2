@@ -16,125 +16,267 @@ struct TextFormattingPanel: View {
     @Binding var textStyle: Font.TextStyle
     @Binding var content: String
     
-    private let colors: [Color] = [
-        .primary, .purple, .pink, .orange, .mint, .blue
+    
+    var onClose: () -> Void
+    
+    
+    private let colors: [Color] = [.black, .purple, .pink, .orange, .mint, .blue]
+    private let colorNames = ["Black", "Purple", "Pink", "Orange", "Mint", "Blue"]
+    
+    
+    private let styles: [(style: Font.TextStyle, name: String)] = [
+        (.title, "Title"),
+        (.headline, "Subtitle"),
+        (.subheadline, "Subheadling"),
+        (.body, "Body")
     ]
     
-    private let styles: [Font.TextStyle] = [
-        .title, .title2, .title3, .body, .subheadline, .footnote
-    ]
+    @State private var showingColorPicker = false
     
     var body: some View {
         VStack(spacing: 16) {
-            HStack(spacing: 20) {
-                ForEach(styles, id: \.self) { style in
-                    Button(action: { textStyle = style }) {
-                        Text(style.label)
-                            .font(.system(style))
-                            .foregroundStyle(textStyle == style ? .blue : .primary)
+            //제목 + x버튼
+            HStack {
+                Text("Format")
+                    .font(.headline)
+                Spacer()
+                Button(action: onClose) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(Color(.systemGray4))
+                }
+            }
+            .padding(.horizontal, 40)
+            
+            //글씨크기
+            HStack {
+                ForEach(styles.indices, id: \.self) { index in
+                    let style = styles[index]
+                    Button(action: { textStyle = style.style }) {
+                        Text(style.name)
+                            .font(.system(style.style))
+                            .foregroundColor(textStyle == style.style ? .blue : .primary)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .padding(.horizontal, 24)
+            
+            //글씨체
+            HStack {
+                HStack(spacing: 2) {
+                    FormatButton(systemName: "bold", isActive: isBold) { isBold.toggle() }
+                        .frame(width: 64, height: 44)
+                    
+                    Divider().frame(height: 24)
+                    
+                    FormatButton(systemName: "italic", isActive: isItalic) { isItalic.toggle() }
+                        .frame(width: 64, height: 44)
+                    
+                    Divider().frame(height: 24)
+                    
+                    FormatButton(systemName: "underline", isActive: isUnderlined) { isUnderlined.toggle() }
+                        .frame(width: 64, height: 44)
+                    
+                    Divider().frame(height: 24)
+                    
+                    FormatButton(systemName: "strikethrough", isActive: isStrikeThrough) { isStrikeThrough.toggle() }
+                        .frame(width: 64, height: 44)
+                }
+                .background(Color(.systemGray5))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                
+                Spacer()
+                
+                HStack(spacing: 2) {
+                    Button(action: { showingColorPicker.toggle() }) {
+                        Image(systemName: "pencil")
+                            .font(.title3)
+                            .foregroundStyle(.black)
+                    }
+                    .frame(width: 44, height: 44)                    .popover(isPresented: $showingColorPicker) {
+                        VStack(spacing: 10) {
+                            ForEach(colors.indices, id: \.self) { index in
+                                Button(action: {
+                                    selectedColor = colors[index]
+                                    showingColorPicker = false
+                                }) {
+                                    HStack {
+                                        Circle()
+                                            .fill(colors[index])
+                                            .frame(width: 20, height: 20)
+                                        Text(colorNames[index])
+                                        Spacer()
+                                        if selectedColor == colors[index] {
+                                            Image(systemName: "checkmark")
+                                                .foregroundColor(.blue)
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                }
+                            }
+                        }
+                        .padding(.vertical)
+                    }
+                    
+                    Divider().frame(height: 24)
+                    
+                    Circle()
+                        .fill(selectedColor)
+                        .frame(width: 16, height: 16)
+                        .frame(width: 44, height: 44)
+                }
+                .background(Color(.systemGray5))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            .padding(.horizontal, 28)
+            
+            
+            //리스트 형식
+            HStack {
+                HStack {
+                    Button(action: { applyListStyle(symbol: "• ") }) {
+                        Image(systemName: "list.bullet")
+                    }
+                    .frame(width: 52, height: 44)
+                    
+                    Divider().frame(height: 24)
+                    
+                    Button(action: { applyListStyle(symbol: "1. ") }) {
+                        Image(systemName: "list.number")
+                    }
+                    .frame(width: 52, height: 44)
+                    
+                    Divider().frame(height: 24)
+                    
+                    Button(action: { applyListStyle(symbol: "- ") }) {
+                        Image(systemName: "list.dash")
+                    }
+                    .frame(width: 52, height: 44)
+                }
+                .background(Color(.systemGray5))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                
+                
+                Spacer()
+                
+                HStack {
+                    Button(action: { applyIndent(increase: false) }) {
+                        Image(systemName: "decrease.indent")
+                            .foregroundStyle(Color.gray)
+                    }
+                    .frame(width: 52, height: 44)
+                    
+                    Divider().frame(height: 24)
+                    
+                    
+                    Button(action: { applyIndent(increase: true) }) {
+                        Image(systemName: "increase.indent")
                     }
                 }
-            }
-            
-            HStack(spacing: 20) {
-                formatButton(systemName: "bold" , isActive: isBold) {
-                    isBold.toggle()
-                }
-                formatButton(systemName: "italic" , isActive: isItalic) {
-                    isItalic.toggle()
-                }
-                formatButton(systemName: "underline" , isActive: isUnderlined) {
-                    isUnderlined.toggle()
-                }
-                formatButton(systemName: "strikethrough" , isActive: isStrikeThrough) {
-                    isStrikeThrough.toggle()
-                }
-            }
-            
-            HStack(spacing: 20) {
-                ForEach(colors, id: \.self) { color in
-                    Button(action: { selectedColor = color }) {
-                        Circle()
-                            .fill(color)
-                            .frame(width: 30, height: 30)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.blue, lineWidth: selectedColor == color ? 2 : 0)
-                            )
-                    }
-                }
-            }
-            
-            HStack(spacing: 20) {
-                listStyleButton(symbol: "list.bullet", action: {
-                    applyListStyle(symbol: "• ")
-                })
+                .background(Color(.systemGray5))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
                 
-                listStyleButton(symbol: "list.number", action: {
-                    applyListStyle(symbol: "1. ")
-                })
+                Spacer()
                 
-                listStyleButton(symbol: "list.dash", action: {
-                    applyListStyle(symbol: "- ")
-                })
+                Button(action: appplyQuote) {
+                    Image(systemName: "text.quote")
+                }
+                .frame(width: 52, height: 44)
+                .background(Color(.systemGray5))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
+            .buttonStyle(FormatButtonStyle())
+            .padding(.horizontal, 28)
+            
+            
+            
         }
-        .padding()
-        .background(.regularMaterial)
+        .padding(.top, 20)
+        .padding(.bottom, 16)
+        .frame(maxWidth: .infinity)
+        .background(
+            Color(.systemGray6)
+                .edgesIgnoringSafeArea(.all)
+        )
         .cornerRadius(16)
-        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -5)
-        .padding(.horizontal)
-        .padding(.bottom, 40)
-    }
-    
-    private func formatButton(
-        systemName: String,
-        isActive: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.title2)
-                .foregroundColor(isActive ? .blue : .primary)
-                .frame(width: 44, height: 44)
-                .background(isActive ? Color.blue.opacity(0.1) : Color.clear)
-                .cornerRadius(8)
-        }
-    }
-    
-    private func listStyleButton(
-        symbol: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.title2)
-                .foregroundColor(.primary)
-                .frame(width: 44, height: 44)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)
-        }
     }
     
     private func applyListStyle(symbol: String) {
         let lines = content.components(separatedBy: "\n")
-        let formattedLines = lines.map { line in
+        let newLines = lines.map { line in
             line.hasPrefix(symbol) ? String(line.dropFirst(symbol.count)) : symbol + line
         }
-        content = formattedLines.joined(separator: "\n")
+        content = newLines.joined(separator: "\n")
+    }
+    
+    private func applyIndent(increase: Bool) {
+        let indent = increase ? "    " : ""
+        let lines = content.components(separatedBy: "\n")
+        let newLines = lines.map { indent + $0}
+        content = newLines.joined(separator: "\n")
+    }
+    
+    private func appplyQuote() {
+        let lines = content.components(separatedBy: "\n")
+        let newLines = lines.map { "> " + $0 }
+        content = newLines.joined(separator: "\n")
     }
 }
 
-extension Font.TextStyle {
-    var label: String {
-        switch self {
-        case.title: return "Title"
-        case.title2: return "Title 2"
-        case.title3: return "Title 3"
-        case.body: return "Body"
-        case.subheadline: return "Subheadline"
-        case.footnote: return "Footnote"
-            default : return ""
+struct FormatButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 20))
+            .frame(width: 44, height: 44)
+            .background(configuration.isPressed ? Color.blue.opacity(0.1) : Color.clear)
+            .cornerRadius(8)
+    }
+}
+
+struct FormatButton: View {
+    let systemName: String
+    let isActive: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 20))
+                .frame(width: 44, height: 44)
+                .foregroundColor(isActive ? .blue : .primary)
+                .cornerRadius(8)
         }
     }
+}
+
+
+#Preview {
+    struct PreviewContainer: View {
+        @State private var isBold = false
+        @State private var isItalic = false
+        @State private var isUnderlined = false
+        @State private var isStrikeThrough = false
+        @State private var selectedColor: Color = .primary
+        @State private var textStyle: Font.TextStyle = .body
+        @State private var content: String = "Sample text content"
+        
+        var body: some View {
+            ZStack(alignment: .bottom) {
+                Color(.systemGray6)
+                    .ignoresSafeArea()
+                
+                TextFormattingPanel(
+                    isBold: $isBold,
+                    isItalic: $isItalic,
+                    isUnderlined: $isUnderlined,
+                    isStrikeThrough: $isStrikeThrough,
+                    selectedColor: $selectedColor,
+                    textStyle: $textStyle,
+                    content: $content,
+                    onClose: {}
+                )
+            }
+        }
+    }
+    return PreviewContainer()
 }

@@ -12,7 +12,7 @@ import _PhotosUI_SwiftUI
 struct MemoDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-
+    
     @Bindable var memo: Memo
     
     @State private var isEditing = false
@@ -22,6 +22,7 @@ struct MemoDetailView: View {
     @State private var showingAttachmentOptions = false
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
     //텍스트 포맷
+    @FocusState private var isEditorFocused: Bool
     @State private var showFormattingPanel = false
     @State private var isBold = false
     @State private var isItalic = false
@@ -29,54 +30,53 @@ struct MemoDetailView: View {
     @State private var isStrikeThrough = false
     @State private var selectedColor: Color = .primary
     @State private var textStyle: Font.TextStyle = .body
-
+    
     
     private var currentAlignment: TextAlignment {
-            switch memo.textAlignment {
-            case 1: return .center
-            case 2: return .trailing
-            default: return .leading
-            }
+        switch memo.textAlignment {
+        case 1: return .center
+        case 2: return .trailing
+        default: return .leading
         }
+    }
     
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 if isEditing {
-                    if !memo.attachments.isEmpty {
-                        ScrollView(.horizontal) {
-                            HStack {
-                                ForEach(memo.attachments) { attachment in
-                                    AttachmentThumbnailView(
-                                        attachment: attachment,
-                                        isEditing: isEditing,
-                                        onDelete: { deleteAttachment(attachment) }
-                                    )
-                                }
-                            }//: HSTACK
+                    Group {
+                        if !memo.attachments.isEmpty {
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ForEach(memo.attachments) { attachment in
+                                        AttachmentThumbnailView(
+                                            attachment: attachment,
+                                            isEditing: isEditing,
+                                            onDelete: { deleteAttachment(attachment) }
+                                        )
+                                    }
+                                }//: HSTACK
+                            }
                         }
+                        
+                        TextField("Title", text: $memo.title)
+                            .font(.largeTitle.bold())
+                            .padding(.horizontal)
+                            .padding(.top)
+                        
+                        
+                        
+                        TextEditor(text: $memo.content)
+                            .multilineTextAlignment(currentAlignment)
+                            .font(.system(textStyle))
+                            .bold(isBold)
+                            .italic(isItalic)
+                            .underline(isUnderlined)
+                            .strikethrough(isStrikeThrough)
+                            .foregroundStyle(selectedColor)
+                            .cornerRadius(8)
+                            .padding(.horizontal)
                     }
-                    
-                    TextField("Title", text: $memo.title)
-                        .font(.largeTitle.bold())
-                        .padding(.horizontal)
-                        .padding(.top)
-                    
-                    
-                    
-                    TextEditor(text: $memo.content)
-                        .multilineTextAlignment(currentAlignment)
-                        .font(.system(textStyle))
-                        .bold(isBold)
-                        .italic(isItalic)
-                        .underline(isUnderlined)
-                        .strikethrough(isStrikeThrough)
-                        .foregroundStyle(selectedColor)
-                        .cornerRadius(8)
-                        .padding(.horizontal)
-                    
-                    
-                    
                 } else {
                     ScrollView {
                         VStack(alignment: .leading) {
@@ -111,7 +111,7 @@ struct MemoDetailView: View {
                                 .cornerRadius(8)
                                 .padding(.horizontal)
                             
-                                
+                            
                             
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -122,14 +122,15 @@ struct MemoDetailView: View {
                     
                 }
                 
-                
-                
+                //하단 툴바(편집 시에만 표시)
                 if isEditing {
                     HStack{
-                        Button(action: { showFormattingPanel.toggle() }) {
+                        Button(action: {
+                                showFormattingPanel.toggle()
+                        }) {
                             Image(systemName: "textformat")
                                 .font(.title2)
-                                .foregroundStyle(showFormattingPanel ? .blue : .primary)
+                                .foregroundStyle(.blue)
                         }
                         
                         Spacer()
@@ -188,7 +189,9 @@ struct MemoDetailView: View {
                             .presentationCompactAdaptation(.popover)
                             .frame(width: 240, height: 120)
                         }
+                        
                         Spacer()
+                        
                         // 정렬 선택 메뉴
                         Button {
                             isShowingAlignmentPopover = true
@@ -233,6 +236,7 @@ struct MemoDetailView: View {
                             .padding(12)
                             .presentationCompactAdaptation(.popover)
                         }
+                        
                         Spacer()
                         
                         // 날짜 설정 버튼
@@ -242,14 +246,35 @@ struct MemoDetailView: View {
                                 .foregroundColor(.blue)
                         }
                     }
-                    .padding(EdgeInsets(top: 10, leading: 40, bottom: 10, trailing: 40))
-                    .background(Color(.systemBackground))
+                    .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
+                    .background(Color(showFormattingPanel ? .systemGray6 : .systemBackground))
                     .overlay(Divider(), alignment: .top)
                     
                 }
             }
-            .navigationBarBackButtonHidden(isEditing)
-            .toolbar {
+            
+            
+            // 텍스트 포맷 패널
+            if showFormattingPanel {
+                TextFormattingPanel(
+                    isBold: $isBold,
+                    isItalic: $isItalic,
+                    isUnderlined: $isUnderlined,
+                    isStrikeThrough: $isStrikeThrough,
+                    selectedColor: $selectedColor,
+                    textStyle: $textStyle,
+                    content: $memo.content,
+                    onClose: { showFormattingPanel = false }
+                )
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
+                .ignoresSafeArea(.container, edges: .bottom)
+                
+            }
+            
+        }
+        .navigationBarBackButtonHidden(isEditing)
+        .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if isEditing {
                         Button("Done") {
@@ -279,7 +304,7 @@ struct MemoDetailView: View {
                     }
                 }
             }
-            .confirmationDialog(
+        .confirmationDialog(
                 "Are you sure you want to delete this note?",
                 isPresented: $showingDeleteConfirm,
                 titleVisibility: .visible
@@ -289,8 +314,8 @@ struct MemoDetailView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
-            .sheet(isPresented: $showingDatePicker) {
-                DatePicker(
+        .sheet(isPresented: $showingDatePicker) {
+            DatePicker(
                     "Select Date",
                     selection: Binding(
                         get: { memo.customDate ?? Date() },
@@ -303,7 +328,7 @@ struct MemoDetailView: View {
                 .labelsHidden()
                 .padding()
             }
-            .onChange(of: selectedPhotoItems) { _, newItems in
+        .onChange(of: selectedPhotoItems) { _, newItems in
                 Task {
                     for item in newItems {
                         if let data = try? await item.loadTransferable(type: Data.self) {
@@ -313,32 +338,15 @@ struct MemoDetailView: View {
                     selectedPhotoItems.removeAll()
                 }
             }
-            
-            if showFormattingPanel {
-                TextFormattingPanel(
-                    isBold: $isBold,
-                    isItalic: $isItalic,
-                    isUnderlined: $isUnderlined,
-                    isStrikeThrough: $isStrikeThrough,
-                    selectedColor: $selectedColor,
-                    textStyle: $textStyle,
-                    content: $memo.content
-                )
-                .transition(.move(edge: .bottom))
-                .zIndex(1)
-            }
+    }
+    
+    private var alignmentIcon: String {
+        switch memo.textAlignment {
+        case 1: return "text.aligncenter"
+        case 2: return "text.alignright"
+        default: return "text.alignleft"
         }
     }
-        
-    
-
-    private var alignmentIcon: String {
-            switch memo.textAlignment {
-            case 1: return "text.aligncenter"
-            case 2: return "text.alignright"
-            default: return "text.alignleft"
-            }
-        }
     
     private func deleteMemo() {
         modelContext.delete(memo)
@@ -381,6 +389,8 @@ struct MemoDetailView: View {
             memo.attachments.remove(at: index)
         }
     }
+    
+    
 }
 
 #Preview {
@@ -397,4 +407,7 @@ struct MemoDetailView: View {
     }
     .modelContainer(container)
 }
+
+
+
 

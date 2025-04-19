@@ -40,12 +40,12 @@ struct ContentView: View {
                                     
                                     Text(formatDate(memo.customDate ?? memo.modifiedAt))
                                         .font(.system(size: 15, weight: .regular))
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(Color.secondary)
                                 }
                                 .padding(.vertical, 4)
                                 Spacer()
                                 Text("Detail")
-                                    .foregroundStyle(Color.secondary)
+                                    .foregroundStyle(.tertiary)
                             }
                         }
                     }
