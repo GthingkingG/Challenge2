@@ -110,7 +110,7 @@ struct ContentView: View {
     
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.d"
+        formatter.dateFormat = "yyyy.MM.dd"
         return formatter.string(from: date)
     }
 }

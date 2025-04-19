@@ -42,7 +42,7 @@ struct MemoDetailView: View {
                                     onDelete: { deleteAttachment(attachment) }
                                 )
                             }
-                        }
+                        }//: HSTACK
                     }
                 }
                 
@@ -95,6 +95,7 @@ struct MemoDetailView: View {
                     .padding(.vertical)
                     
                 }
+                .scrollIndicators(.hidden)
                 
             }
             
