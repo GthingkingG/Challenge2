@@ -76,6 +76,8 @@ struct MemoDetailView: View {
                             .foregroundStyle(selectedColor)
                             .cornerRadius(8)
                             .padding(.horizontal)
+                            .focused($isEditorFocused)
+                            .disabled(showFormattingPanel)
                     }
                 } else {
                     ScrollView {
@@ -125,9 +127,7 @@ struct MemoDetailView: View {
                 //하단 툴바(편집 시에만 표시)
                 if isEditing {
                     HStack{
-                        Button(action: {
-                                showFormattingPanel.toggle()
-                        }) {
+                        Button(action: handleFormatButton) {
                             Image(systemName: "textformat")
                                 .font(.title2)
                                 .foregroundStyle(.blue)
@@ -269,6 +269,7 @@ struct MemoDetailView: View {
                 .transition(.move(edge: .bottom))
                 .zIndex(1)
                 .ignoresSafeArea(.container, edges: .bottom)
+                .onDisappear { isEditorFocused = false }
                 
             }
             
@@ -387,6 +388,19 @@ struct MemoDetailView: View {
         
         if let index = memo.attachments.firstIndex(where: { $0.id == attachment.id }) {
             memo.attachments.remove(at: index)
+        }
+    }
+    
+    private func handleFormatButton() {
+        if showFormattingPanel {
+            withAnimation {
+                showFormattingPanel = false
+            }
+        } else {
+            isEditorFocused = false
+            withAnimation {
+                showFormattingPanel = true
+            }
         }
     }
     
