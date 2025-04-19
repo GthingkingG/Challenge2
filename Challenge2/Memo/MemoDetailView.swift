@@ -12,13 +12,23 @@ import _PhotosUI_SwiftUI
 struct MemoDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+
     @Bindable var memo: Memo
+    
     @State private var isEditing = false
     @State private var showingDeleteConfirm = false
     @State private var showingDatePicker = false
     @State private var isShowingAlignmentPopover = false
     @State private var showingAttachmentOptions = false
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
+    //텍스트 포맷
+    @State private var showFormattingPanel = false
+    @State private var isBold = false
+    @State private var isItalic = false
+    @State private var isUnderlined = false
+    @State private var isStrikeThrough = false
+    @State private var selectedColor: Color = .primary
+    @State private var textStyle: Font.TextStyle = .body
 
     
     private var currentAlignment: TextAlignment {
@@ -30,261 +40,292 @@ struct MemoDetailView: View {
         }
     
     var body: some View {
-        VStack(spacing: 0) {
-            if isEditing {
-                if !memo.attachments.isEmpty {
-                    ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(memo.attachments) { attachment in
-                                AttachmentThumbnailView(
-                                    attachment: attachment,
-                                    isEditing: isEditing,
-                                    onDelete: { deleteAttachment(attachment) }
-                                )
-                            }
-                        }//: HSTACK
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                if isEditing {
+                    if !memo.attachments.isEmpty {
+                        ScrollView(.horizontal) {
+                            HStack {
+                                ForEach(memo.attachments) { attachment in
+                                    AttachmentThumbnailView(
+                                        attachment: attachment,
+                                        isEditing: isEditing,
+                                        onDelete: { deleteAttachment(attachment) }
+                                    )
+                                }
+                            }//: HSTACK
+                        }
                     }
-                }
-                
-                TextField("Title", text: $memo.title)
-                    .font(.largeTitle.bold())
-                    .padding(.horizontal)
-                    .padding(.top)
-                
-                
-                
-                TextEditor(text: $memo.content)
-                    .multilineTextAlignment(currentAlignment)
-                    .cornerRadius(8)
-                    .padding(.horizontal)
-                
-                
-                
-            } else {
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        if !memo.attachments.isEmpty {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack {
-                                    ForEach(memo.attachments) { attachment in
-                                        AttachmentThumbnailView(
-                                            attachment: attachment,
-                                            isEditing: isEditing,
-                                            onDelete: { deleteAttachment(attachment) }
-                                        )
+                    
+                    TextField("Title", text: $memo.title)
+                        .font(.largeTitle.bold())
+                        .padding(.horizontal)
+                        .padding(.top)
+                    
+                    
+                    
+                    TextEditor(text: $memo.content)
+                        .multilineTextAlignment(currentAlignment)
+                        .font(.system(textStyle))
+                        .bold(isBold)
+                        .italic(isItalic)
+                        .underline(isUnderlined)
+                        .strikethrough(isStrikeThrough)
+                        .foregroundStyle(selectedColor)
+                        .cornerRadius(8)
+                        .padding(.horizontal)
+                    
+                    
+                    
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            if !memo.attachments.isEmpty {
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        ForEach(memo.attachments) { attachment in
+                                            AttachmentThumbnailView(
+                                                attachment: attachment,
+                                                isEditing: isEditing,
+                                                onDelete: { deleteAttachment(attachment) }
+                                            )
+                                        }
                                     }
                                 }
                             }
-                        }
-                        
-                        
-                        Text(memo.title)
-                            .font(.largeTitle.bold())
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
-                        
-                        Text(memo.content)
-                            .multilineTextAlignment(currentAlignment)
-                            .cornerRadius(8)
-                            .padding(.horizontal)
-                        
                             
+                            
+                            Text(memo.title)
+                                .font(.largeTitle.bold())
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                            
+                            Text(memo.content)
+                                .multilineTextAlignment(currentAlignment)
+                                .font(.system(textStyle))
+                                .bold(isBold)
+                                .italic(isItalic)
+                                .underline(isUnderlined)
+                                .strikethrough(isStrikeThrough)
+                                .foregroundStyle(selectedColor)
+                                .cornerRadius(8)
+                                .padding(.horizontal)
+                            
+                                
+                            
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical)
                         
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical)
+                    .scrollIndicators(.hidden)
                     
                 }
-                .scrollIndicators(.hidden)
                 
-            }
-            
-            
-            
-            if isEditing {
-                HStack{
-                    //이미지 파일 버튼
-                    Button(action: { showingAttachmentOptions = true }) {
-                        Image(systemName: "paperclip")
-                            .font(.title2)
-                            .foregroundColor(.blue)
-                    }
-                    .popover(isPresented: $showingAttachmentOptions) {
-                        VStack(alignment: .leading) {
-                            PhotosPicker(
-                                selection: $selectedPhotoItems,
-                                matching: .images
-                            ) {
-                                HStack {
-                                    Text("Select Image")
-                                    Spacer()
-                                    Image(systemName: "photo.on.rectangle")
+                
+                
+                if isEditing {
+                    HStack{
+                        Button(action: { showFormattingPanel.toggle() }) {
+                            Image(systemName: "textformat")
+                                .font(.title2)
+                                .foregroundStyle(showFormattingPanel ? .blue : .primary)
+                        }
+                        
+                        Spacer()
+                        
+                        //이미지 파일 버튼
+                        Button(action: { showingAttachmentOptions = true }) {
+                            Image(systemName: "paperclip")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                        }
+                        .popover(isPresented: $showingAttachmentOptions) {
+                            VStack(alignment: .leading) {
+                                PhotosPicker(
+                                    selection: $selectedPhotoItems,
+                                    matching: .images
+                                ) {
+                                    HStack {
+                                        Text("Select Image")
+                                        Spacer()
+                                        Image(systemName: "photo.on.rectangle")
+                                    }
+                                    .font(.system(size: 17, weight: .light))
+                                    .foregroundColor(.black)
                                 }
-                                .font(.system(size: 17, weight: .light))
-                                .foregroundColor(.black)
-                            }
-                            .onChange(of: selectedPhotoItems) {
-                                showingAttachmentOptions = false
-                            }
-                            Divider()
-                            Button{
-                                showingAttachmentOptions = false
-                            } label: {
-                                HStack {
-                                    Text("Attach file")
-                                    Spacer()
-                                    Image(systemName: "doc")
+                                .onChange(of: selectedPhotoItems) {
+                                    showingAttachmentOptions = false
                                 }
-                                .font(.system(size: 17, weight: .light))
-                                .foregroundColor(.secondary)
+                                Divider()
+                                Button{
+                                    showingAttachmentOptions = false
+                                } label: {
+                                    HStack {
+                                        Text("Attach file")
+                                        Spacer()
+                                        Image(systemName: "doc")
+                                    }
+                                    .font(.system(size: 17, weight: .light))
+                                    .foregroundColor(.secondary)
+                                    
+                                }
+                                Divider()
+                                Button {
+                                    showingAttachmentOptions = false
+                                } label: {
+                                    HStack {
+                                        Text("Record Audio")
+                                        Spacer()
+                                        Image(systemName: "waveform")
+                                    }
+                                    .font(.system(size: 17, weight: .light))
+                                    .foregroundColor(.secondary)
+                                }
                                 
                             }
-                            Divider()
-                            Button {
-                                showingAttachmentOptions = false
-                            } label: {
-                                HStack {
-                                    Text("Record Audio")
-                                    Spacer()
-                                    Image(systemName: "waveform")
+                            .padding(.horizontal)
+                            .presentationCompactAdaptation(.popover)
+                            .frame(width: 240, height: 120)
+                        }
+                        Spacer()
+                        // 정렬 선택 메뉴
+                        Button {
+                            isShowingAlignmentPopover = true
+                        } label: {
+                            Image(systemName: "text.alignleft")
+                                .font(.title2)
+                                .foregroundColor(isShowingAlignmentPopover ? .secondary : .blue)
+                        }
+                        .popover(isPresented: $isShowingAlignmentPopover, arrowEdge: .bottom) {
+                            HStack {
+                                Button(action: {
+                                    memo.textAlignment = 3
+                                    isShowingAlignmentPopover = false
+                                }) {
+                                    Image(systemName: "text.alignleft")
+                                        .font(.title2)
+                                        .foregroundColor(memo.textAlignment == 3 ? .blue : .primary)
+                                        .frame(width: 44, height: 44)
+                                        .contentShape(Rectangle())
                                 }
-                                .font(.system(size: 17, weight: .light))
-                                .foregroundColor(.secondary)
+                                Button(action: {
+                                    memo.textAlignment = 1
+                                    isShowingAlignmentPopover = false
+                                }) {
+                                    Image(systemName: "text.aligncenter")
+                                        .font(.title2)
+                                        .foregroundColor(memo.textAlignment == 1 ? .blue : .primary)
+                                        .frame(width: 44, height: 44)
+                                        .contentShape(Rectangle())
+                                }
+                                Button(action: {
+                                    memo.textAlignment = 2
+                                    isShowingAlignmentPopover = false
+                                }) {
+                                    Image(systemName: "text.alignright")
+                                        .font(.title2)
+                                        .foregroundColor(memo.textAlignment == 2 ? .blue : .primary)
+                                        .frame(width: 44, height: 44)
+                                        .contentShape(Rectangle())
+                                }
                             }
-                            
+                            .padding(12)
+                            .presentationCompactAdaptation(.popover)
                         }
-                        .padding(.horizontal)
-                        .presentationCompactAdaptation(.popover)
-                        .frame(width: 240, height: 120)
+                        Spacer()
+                        
+                        // 날짜 설정 버튼
+                        Button(action: { showingDatePicker = true }) {
+                            Image(systemName: "calendar")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                        }
                     }
-                    Spacer()
-                    // 정렬 선택 메뉴
-                    Button {
-                        isShowingAlignmentPopover = true
+                    .padding(EdgeInsets(top: 10, leading: 40, bottom: 10, trailing: 40))
+                    .background(Color(.systemBackground))
+                    .overlay(Divider(), alignment: .top)
+                    
+                }
+            }
+            .navigationBarBackButtonHidden(isEditing)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if isEditing {
+                        Button("Done") {
+                            memo.modifiedAt = Date()
+                            showFormattingPanel = false
+                            isEditing = false
+                        }
+                    } else {
+                        Button("Edit") {
+                            isEditing = true
+                        }
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(role: .destructive, action: {
+                            showingDeleteConfirm = true
+                        }) {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        
+                        Button(action: shareMemo) {
+                            Label("Upload", systemImage: "square.and.arrow.up")
+                        }
                     } label: {
-                        Image(systemName: "text.alignleft")
-                            .font(.title2)
-                            .foregroundColor(isShowingAlignmentPopover ? .secondary : .blue)
-                    }
-                    .popover(isPresented: $isShowingAlignmentPopover, arrowEdge: .bottom) {
-                        HStack {
-                            Button(action: {
-                                memo.textAlignment = 3
-                                isShowingAlignmentPopover = false
-                            }) {
-                                Image(systemName: "text.alignleft")
-                                    .font(.title2)
-                                    .foregroundColor(memo.textAlignment == 3 ? .blue : .primary)
-                                    .frame(width: 44, height: 44)
-                                    .contentShape(Rectangle())
-                            }
-                            Button(action: {
-                                memo.textAlignment = 1
-                                isShowingAlignmentPopover = false
-                            }) {
-                                Image(systemName: "text.aligncenter")
-                                    .font(.title2)
-                                    .foregroundColor(memo.textAlignment == 1 ? .blue : .primary)
-                                    .frame(width: 44, height: 44)
-                                    .contentShape(Rectangle())
-                            }
-                            Button(action: {
-                                memo.textAlignment = 2
-                                isShowingAlignmentPopover = false
-                            }) {
-                                Image(systemName: "text.alignright")
-                                    .font(.title2)
-                                    .foregroundColor(memo.textAlignment == 2 ? .blue : .primary)
-                                    .frame(width: 44, height: 44)
-                                    .contentShape(Rectangle())
-                            }
-                        }
-                        .padding(12)
-                        .presentationCompactAdaptation(.popover)
-                    }
-                    Spacer()
-                    
-                    // 날짜 설정 버튼
-                    Button(action: { showingDatePicker = true }) {
-                        Image(systemName: "calendar")
-                            .font(.title2)
-                            .foregroundColor(.blue)
+                        Image(systemName: "ellipsis.circle")
                     }
                 }
-                .padding(EdgeInsets(top: 10, leading: 40, bottom: 10, trailing: 40))
-                .frame(maxWidth: .infinity)
-                .background(
-                    Rectangle()
-                        .fill(Color(.systemBackground))
-                        .edgesIgnoringSafeArea(.bottom)
-                        .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: -2)
+            }
+            .confirmationDialog(
+                "Are you sure you want to delete this note?",
+                isPresented: $showingDeleteConfirm,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    deleteMemo()
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+            .sheet(isPresented: $showingDatePicker) {
+                DatePicker(
+                    "Select Date",
+                    selection: Binding(
+                        get: { memo.customDate ?? Date() },
+                        set: { memo.customDate = $0 }
+                    ),
+                    displayedComponents: [.date, .hourAndMinute]
                 )
-                .overlay(Divider(), alignment: .top)
-                
+                .datePickerStyle(.graphical)
+                .presentationDetents([.height(400)])
+                .labelsHidden()
+                .padding()
             }
-        }
-        .navigationBarBackButtonHidden(isEditing)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if isEditing {
-                    Button("Done") {
-                        memo.modifiedAt = Date()
-                        isEditing = false
+            .onChange(of: selectedPhotoItems) { _, newItems in
+                Task {
+                    for item in newItems {
+                        if let data = try? await item.loadTransferable(type: Data.self) {
+                            saveImage(data: data)
+                        }
                     }
-                } else {
-                    Button("Edit") {
-                        isEditing = true
-                    }
+                    selectedPhotoItems.removeAll()
                 }
             }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button(role: .destructive, action: {
-                        showingDeleteConfirm = true
-                    }) {
-                        Label("Delete", systemImage: "trash")
-                    }
-                    
-                    Button(action: shareMemo) {
-                        Label("Upload", systemImage: "square.and.arrow.up")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-            }
-        }
-        .confirmationDialog(
-            "Are you sure you want to delete this note?",
-            isPresented: $showingDeleteConfirm,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                deleteMemo()
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-        .sheet(isPresented: $showingDatePicker) {
-            DatePicker(
-                "Select Date",
-                selection: Binding(
-                    get: { memo.customDate ?? Date() },
-                    set: { memo.customDate = $0 }
-                ),
-                displayedComponents: [.date, .hourAndMinute]
-            )
-            .datePickerStyle(.graphical)
-            .presentationDetents([.height(400)])
-            .labelsHidden()
-            .padding()
-        }
-        .onChange(of: selectedPhotoItems) { _, newItems in
-            Task {
-                for item in newItems {
-                    if let data = try? await item.loadTransferable(type: Data.self) {
-                        saveImage(data: data)
-                    }
-                }
-                selectedPhotoItems.removeAll()
+            
+            if showFormattingPanel {
+                TextFormattingPanel(
+                    isBold: $isBold,
+                    isItalic: $isItalic,
+                    isUnderlined: $isUnderlined,
+                    isStrikeThrough: $isStrikeThrough,
+                    selectedColor: $selectedColor,
+                    textStyle: $textStyle,
+                    content: $memo.content
+                )
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
             }
         }
     }
