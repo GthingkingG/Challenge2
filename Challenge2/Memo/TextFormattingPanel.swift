@@ -42,8 +42,11 @@ struct TextFormattingPanel: View {
                 Spacer()
                 Button(action: onClose) {
                     Image(systemName: "xmark.circle.fill")
+                        .font(.title)
                         .foregroundColor(Color(.systemGray4))
+                    
                 }
+                
             }
             .padding(.horizontal, 40)
             

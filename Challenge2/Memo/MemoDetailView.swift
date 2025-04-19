@@ -41,7 +41,7 @@ struct MemoDetailView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .bottom) {
+        GeometryReader { geometry in
             VStack(spacing: 0) {
                 if isEditing {
                     Group {
@@ -246,33 +246,34 @@ struct MemoDetailView: View {
                                 .foregroundColor(.blue)
                         }
                     }
-                    .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
+                    .padding(.horizontal, 40)
+                    .frame(height: 60)
                     .background(Color(showFormattingPanel ? .systemGray6 : .systemBackground))
                     .overlay(Divider(), alignment: .top)
                     
                 }
             }
-            
-            
             // 텍스트 포맷 패널
-            if showFormattingPanel {
-                TextFormattingPanel(
-                    isBold: $isBold,
-                    isItalic: $isItalic,
-                    isUnderlined: $isUnderlined,
-                    isStrikeThrough: $isStrikeThrough,
-                    selectedColor: $selectedColor,
-                    textStyle: $textStyle,
-                    content: $memo.content,
-                    onClose: { showFormattingPanel = false }
-                )
-                .transition(.move(edge: .bottom))
-                .zIndex(1)
-                .ignoresSafeArea(.container, edges: .bottom)
-                .onDisappear { isEditorFocused = false }
+            .overlay(alignment: .bottom) {
                 
+                if showFormattingPanel {
+                    TextFormattingPanel(
+                        isBold: $isBold,
+                        isItalic: $isItalic,
+                        isUnderlined: $isUnderlined,
+                        isStrikeThrough: $isStrikeThrough,
+                        selectedColor: $selectedColor,
+                        textStyle: $textStyle,
+                        content: $memo.content,
+                        onClose: { showFormattingPanel = false }
+                    )
+                    .transition(.move(edge: .bottom))
+                    .zIndex(1)
+                    .ignoresSafeArea(.container, edges: .bottom)
+                    .onDisappear { isEditorFocused = false }
+                    
+                }
             }
-            
         }
         .navigationBarBackButtonHidden(isEditing)
         .toolbar {
@@ -421,6 +422,7 @@ struct MemoDetailView: View {
     }
     .modelContainer(container)
 }
+
 
 
 
