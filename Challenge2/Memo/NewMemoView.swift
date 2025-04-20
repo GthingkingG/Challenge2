@@ -15,16 +15,24 @@ struct NewMemoView: View {
     @State private var title = ""
     @State private var content = ""
     
+    @FocusState private var isTitleFocused: Bool
+    @FocusState private var isContentFocused: Bool
     var body: some View {
         NavigationStack {
             VStack {
                 TextField("Title", text: $title)
                     .font(.largeTitle.bold())
                     .padding(.horizontal)
+                    .focused($isTitleFocused)
+                    .submitLabel(.next)
+                    .onSubmit {
+                        isContentFocused = true
+                    }
                 
                 TextEditor(text: $content)
                     .cornerRadius(8)
                     .padding(.horizontal)
+                    .focused($isContentFocused)
                 
                 Spacer()
             }
@@ -44,6 +52,9 @@ struct NewMemoView: View {
                     .disabled(title.isEmpty && content.isEmpty)
                 }
             }
+        }
+        .onAppear {
+            isTitleFocused = true
         }
     }
     

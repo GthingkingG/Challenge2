@@ -31,6 +31,9 @@ struct MemoDetailView: View {
     @State private var selectedColor: Color = .primary
     @State private var textStyle: Font.TextStyle = .body
     
+    private let titleID = "titleView"
+    private let attachmentID = "attachmentView"
+    
     
     private var currentAlignment: TextAlignment {
         switch memo.textAlignment {
@@ -41,7 +44,6 @@ struct MemoDetailView: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
             VStack(spacing: 0) {
                 if isEditing {
                     Group {
@@ -80,49 +82,70 @@ struct MemoDetailView: View {
                             .disabled(showFormattingPanel)
                     }
                 } else {
-                    ScrollView {
-                        VStack(alignment: .leading) {
-                            if !memo.attachments.isEmpty {
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack {
-                                        ForEach(memo.attachments) { attachment in
-                                            AttachmentThumbnailView(
-                                                attachment: attachment,
-                                                isEditing: isEditing,
-                                                onDelete: { deleteAttachment(attachment) }
-                                            )
-                                            
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            VStack(alignment: .leading) {
+                                
+                                //날짜
+                                Text(formattedCustomDate)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    .padding(.horizontal)                                
+                                
+                                //첨부파일
+                                if !memo.attachments.isEmpty {
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack {
+                                            ForEach(memo.attachments) { attachment in
+                                                AttachmentThumbnailView(
+                                                    attachment: attachment,
+                                                    isEditing: isEditing,
+                                                    onDelete: { deleteAttachment(attachment) }
+                                                )
+                                                
+                                            }
                                         }
+                                        .padding(.horizontal, 8)
                                     }
-                                    .padding(.horizontal, 8)
+                                    .id(attachmentID)
+                                    .padding(.top, 8)
                                 }
+                                
+                                
+                                Text(memo.title)
+                                    .id(titleID)
+                                    .font(.largeTitle.bold())
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 8)
+                                    .padding(.top, 8)
+                                
+                                Text(memo.content)
+                                    .multilineTextAlignment(currentAlignment)
+                                    .font(.system(textStyle))
+                                    .bold(isBold)
+                                    .italic(isItalic)
+                                    .underline(isUnderlined)
+                                    .strikethrough(isStrikeThrough)
+                                    .foregroundStyle(selectedColor)
+                                    .cornerRadius(8)
+                                    .padding(.horizontal)
+                                
+                                Spacer().frame(height: 640)
+                                
+                                
                             }
-                            
-                            
-                            Text(memo.title)
-                                .font(.largeTitle.bold())
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                            
-                            Text(memo.content)
-                                .multilineTextAlignment(currentAlignment)
-                                .font(.system(textStyle))
-                                .bold(isBold)
-                                .italic(isItalic)
-                                .underline(isUnderlined)
-                                .strikethrough(isStrikeThrough)
-                                .foregroundStyle(selectedColor)
-                                .cornerRadius(8)
-                                .padding(.horizontal)
-                            
-                            
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical)
                             
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical)
-                        
+                        .scrollIndicators(.hidden)
+                        .onAppear {
+                            DispatchQueue.main.async {
+                                proxy.scrollTo(memo.attachments.isEmpty ? titleID : attachmentID, anchor: .top)
+                            }
+                        }
                     }
-                    .scrollIndicators(.hidden)
                     
                 }
                 
@@ -276,7 +299,7 @@ struct MemoDetailView: View {
                     
                 }
             }
-        }
+        
         .navigationBarBackButtonHidden(isEditing)
         .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -407,6 +430,12 @@ struct MemoDetailView: View {
         }
     }
     
+    private var formattedCustomDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd"
+        return formatter.string(from: memo.customDate ?? memo.modifiedAt)
+    }
+    
     
 }
 
@@ -424,6 +453,7 @@ struct MemoDetailView: View {
     }
     .modelContainer(container)
 }
+
 
 
 
