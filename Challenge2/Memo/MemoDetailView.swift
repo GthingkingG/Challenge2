@@ -33,6 +33,7 @@ struct MemoDetailView: View {
     
     private let titleID = "titleView"
     private let attachmentID = "attachmentView"
+    @State private var isDateVisible = false
     
     
     private var currentAlignment: TextAlignment {
@@ -91,7 +92,9 @@ struct MemoDetailView: View {
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                     .frame(maxWidth: .infinity, alignment: .center)
-                                    .padding(.horizontal)                                
+                                    .padding(.horizontal)
+                                    .opacity(isDateVisible ? 1 : 0)
+                                
                                 
                                 //첨부파일
                                 if !memo.attachments.isEmpty {
@@ -143,6 +146,12 @@ struct MemoDetailView: View {
                         .onAppear {
                             DispatchQueue.main.async {
                                 proxy.scrollTo(memo.attachments.isEmpty ? titleID : attachmentID, anchor: .top)
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    withAnimation {
+                                        isDateVisible = true
+                                    }
+                                }
                             }
                         }
                     }
