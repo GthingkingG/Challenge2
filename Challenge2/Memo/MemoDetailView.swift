@@ -280,7 +280,7 @@ struct MemoDetailView: View {
                                 .foregroundColor(.blue)
                         }
                     }
-                    .padding(.horizontal, 40)
+                    .padding(.horizontal, 28)
                     .frame(height: 60)
                     .background(Color(showFormattingPanel ? .systemGray6 : .systemBackground))
                     .overlay(Divider(), alignment: .top)

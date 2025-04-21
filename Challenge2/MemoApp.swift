@@ -12,7 +12,7 @@ import SwiftData
 struct MemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
                 .modelContainer(for: [Memo.self])
         }
     }
