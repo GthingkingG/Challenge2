@@ -11,9 +11,15 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Memo.customDate, order: .reverse) private var memos: [Memo]
+    
+    
     @State private var searchText = ""
+    
+    
     @State private var isAddingNewMemo = false
     @State private var showingDeleteConfirm = false
+    
+    
     @State private var memoToDelete: Memo?
     
     var filteredMemos: [Memo] {

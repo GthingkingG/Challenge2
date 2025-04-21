@@ -27,21 +27,26 @@ enum potLevel: Int {
 
 struct MainView: View {
     @Query(sort: \Memo.customDate, order: .reverse) private var memos: [Memo]
+    
+    let selectedType: myType
+    @EnvironmentObject var userData: UserData
+    
     var body: some View {
+
         
         let level = potLevel(count: memos.count)
         
         NavigationStack {
             VStack {
-                    NavigationLink(destination: ProfileView()) {
+                NavigationLink(destination: ProfileView(selectedType: selectedType)) {
                         HStack {
                             Spacer()
-                            Text("One")
+                            Text(userData.userName)
                                 .foregroundStyle(.white)
                                 .padding(40)
                                 .background(
                                     Circle()
-                                        .fill(Color.blue)
+                                        .fill(selectedType.typeColor)
                                         .opacity(0.3)
                                         .frame(width: 45, height: 45)
                                 )
@@ -68,9 +73,12 @@ struct MainView: View {
                 .frame(width: 402, height: 80)
             }
         }
+        .navigationBarBackButtonHidden(true)
+        
     }
 }
 
 #Preview {
-    MainView()
+    MainView(selectedType: .cherryTomatoes)
+        .environmentObject(UserData())
 }
