@@ -9,6 +9,21 @@ import SwiftData
 import Foundation
 
 @Model
+class UserInfo {
+    var userName: String
+    var userType: myType
+    var memos: [Memo]
+    
+    init(userName: String, userType: myType, memos: [Memo] = []) {
+        self.userName = userName
+        self.userType = userType
+        self.memos = memos
+    }
+}
+
+
+
+@Model
 class Memo {
     var title: String
     var content: String
@@ -19,6 +34,10 @@ class Memo {
     var customDate: Date?
     
     var attachments: [Attachment]
+    
+    @Relationship(inverse: \UserInfo.memos)
+    var userInfo: UserInfo?
+
     
     init(title: String, content: String, createdAt: Date = Date(), modifiedAt: Date = Date(), textAlignment: Int = 3, customDate: Date? = nil, attachments: [Attachment] = []) {
         self.title = title
@@ -38,6 +57,9 @@ class Attachment: Identifiable {
     var fileName: String
     var fileURL: String
     var type: String
+    
+//    @Relationship(deleteRule: .cascade, inverse: \Memo.attachments)
+//    var memo: Memo?
     
     init(fileName: String, fileURL: String, type: String) {
         self.fileName = fileName

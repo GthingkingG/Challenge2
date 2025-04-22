@@ -6,16 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ProfileView: View {
+    @Query private var userInfos: [UserInfo]
+    
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var userData: UserData
     
     @State var isCard: Bool = false
-    let selectedType: myType
     
     var body: some View {
-       
+        let userInfo: UserInfo = userInfos.first ?? UserInfo.init(userName: "Name", userType: .greenOnions)
         
         VStack {
             VStack(alignment: .leading) {
@@ -39,10 +40,10 @@ struct ProfileView: View {
             
             ZStack {
                 Circle()
-                    .fill(selectedType.typeColor)
+                    .fill(userInfo.userType.typeColor)
                     .opacity(0.5)
                     .frame(width: 160, height: 160)
-                Text(userData.userName)
+                Text(userInfo.userName)
                     .font(.largeTitle.bold())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -59,18 +60,18 @@ struct ProfileView: View {
                     VStack {
                         ZStack{
                             Circle()
-                                .fill(selectedType.typeColor.opacity(0.7))
+                                .fill(userInfo.userType.typeColor.opacity(0.7))
                                 .frame(width: 160, height: 160)
 
-                            Image("\(selectedType.rawValue)")
+                            Image("\(userInfo.userType.rawValue)")
                                 .resizable()
-                                .frame(width: 120, height: 120)
+                                .frame(width: 100, height: 100)
                                 .scaledToFill()
                         }
                         .padding(.top, 18)
                         .padding(.bottom, 6)
                         
-                        Text(selectedType.rawValue)
+                        Text(userInfo.userType.rawValue)
                             .font(.largeTitle.bold())
                             .foregroundStyle(.black)
                             .padding(.bottom, 16)
@@ -80,7 +81,7 @@ struct ProfileView: View {
                     .frame(width: 370, height: 252)
                     .background {
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(selectedType.typeColor.opacity(0.7))
+                            .fill(userInfo.userType.typeColor.opacity(0.7))
                             .stroke(Color.white, lineWidth: 4)
                             
                     }
@@ -92,14 +93,14 @@ struct ProfileView: View {
                             .frame(width: 370, height: 252)
                             .cornerRadius(16)
                         VStack(alignment: .leading) {
-                            Text("타입: \(selectedType.typeName)")
+                            Text("타입: \(userInfo.userType.typeName)")
                             Divider().frame(width: 320, height: 12)
-                            Text("의미: \(selectedType.typeMeans)")
+                            Text("의미: \(userInfo.userType.typeMeans)")
                             Divider().frame(width: 320, height: 12)
-                            Text("설명: \(selectedType.typeDetail)")
+                            Text("설명: \(userInfo.userType.typeDetail)")
                                 .frame(width: 320)
                         }
-                        .font(.title2)
+                        .font(.title3)
                         .foregroundStyle(.black)
                         
                     }
@@ -117,7 +118,6 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView(selectedType: .basil)
-        .environmentObject(UserData())
+    ProfileView()
     
 }

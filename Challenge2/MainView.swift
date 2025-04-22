@@ -26,64 +26,64 @@ enum potLevel: Int {
 }
 
 struct MainView: View {
-    @Query(sort: \Memo.customDate, order: .reverse) private var memos: [Memo]
-    
-    let selectedType: myType
-    @EnvironmentObject var userData: UserData
+    @Query private var userInfos: [UserInfo]
+    @Query private var memos: [Memo]
     
     var body: some View {
-
-        
-        let level = potLevel(count: memos.count)
-        
-        NavigationStack {
-            VStack {
-                NavigationLink(destination: ProfileView(selectedType: selectedType)) {
-                        HStack {
-                            Spacer()
-                            ZStack {
-                                Circle()
-                                    .fill(selectedType.typeColor)
-                                    .opacity(0.5)
-                                    .frame(width: 64, height: 64)
-                                Text(userData.userName)
-                                    .font(.title2.bold())
-                                    .foregroundStyle(.white)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                                    .frame(width: 60)
+        ForEach(userInfos) { userInfo in
+            let level = potLevel(count: memos.count)
+            NavigationStack {
+                VStack {
+                    NavigationLink(destination: ProfileView()) {
+                            HStack {
+                                Spacer()
+                                ZStack {
+                                    Circle()
+                                        .fill(userInfo.userType.typeColor)
+                                        .opacity(0.5)
+                                        .frame(width: 64, height: 64)
+                                    Text(userInfo.userName)
+                                        .font(.title2.bold())
+                                        .foregroundStyle(.white)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.5)
+                                        .frame(width: 60)
+                                }
+                                .padding(.horizontal, 32)
+                                .padding(.vertical, 16)
+                                    
                             }
-                            .padding(.horizontal, 32)
-                            .padding(.vertical, 16)
-                                
+                        }
+                    Spacer()
+                    Image(level.rawValue > 2 ? "\(level.imageName)_\(userInfo.userType.rawValue)" : level.imageName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width :160, height: 160)
+                    Spacer()
+                    HStack {
+                        NavigationLink(destination: ContentView()) {
+                            Text("Reflection: \(memos.count)")
+                                .foregroundStyle(.white)
+                                .frame(width: 240, height: 44)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.blue)
+                                )
                         }
                     }
-                Spacer()
-                Image(level.rawValue > 2 ? "\(level.imageName)_\(selectedType.rawValue)" : level.imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width :160, height: 160)
-                Spacer()
-                HStack {
-                    NavigationLink(destination: ContentView()) {
-                        Text("Reflection: \(memos.count)")
-                            .foregroundStyle(.white)
-                            .frame(width: 240, height: 44)
-                            .background(
-                                Capsule()
-                                    .fill(Color.blue)
-                            )
-                    }
+                    .frame(width: 402, height: 80)
                 }
-                .frame(width: 402, height: 80)
             }
+            .navigationBarBackButtonHidden(true)
+            
         }
-        .navigationBarBackButtonHidden(true)
+        
+        
         
     }
 }
 
 #Preview {
-    MainView(selectedType: .cherryTomatoes)
-        .environmentObject(UserData())
+    MainView()
+    
 }

@@ -10,12 +10,11 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Memo.customDate, order: .reverse) private var memos: [Memo]
+    
+    @Query private var memos: [Memo]
     
     
     @State private var searchText = ""
-    
-    
     @State private var isAddingNewMemo = false
     @State private var showingDeleteConfirm = false
     
@@ -33,7 +32,10 @@ struct ContentView: View {
         }
     }
     
+    
+    
     var body: some View {
+        
         NavigationStack {
                 List {
                     ForEach(filteredMemos) { memo in
@@ -109,6 +111,7 @@ struct ContentView: View {
         }
     }
     
+    
     private func deleteMemo(_ memo: Memo) {
         modelContext.delete(memo)
         memoToDelete = nil
@@ -119,29 +122,10 @@ struct ContentView: View {
         formatter.dateFormat = "yyyy.MM.dd"
         return formatter.string(from: date)
     }
+    
+    
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Memo.self, configurations: config)
-    
-    // 샘플 데이터 추가
-    let sampleMemo1 = Memo(title: "Apple",
-                          content: "1. 우유\n2. 빵\n3. 계란",
-                          createdAt: Date().addingTimeInterval(-86400),
-                          modifiedAt: Date().addingTimeInterval(-3600),
-                           customDate: Date().addingTimeInterval(-3600))
-    
-    let sampleMemo2 = Memo(title: "Banana",
-                          content: "1. 프로젝트 현황\n2. 다음 마일스톤\n3. 질문 및 토론",
-                          createdAt: Date().addingTimeInterval(-172800),
-                          modifiedAt: Date().addingTimeInterval(-86400),
-                           customDate: Date().addingTimeInterval(-3600))
-    
-    container.mainContext.insert(sampleMemo1)
-    container.mainContext.insert(sampleMemo2)
-
-    
-    return ContentView()
-        .modelContainer(container)
+    ContentView()
 }

@@ -10,21 +10,21 @@ import SwiftData
 
 @main
 struct MemoApp: App {
-    @StateObject private var userData = UserData()
-    let a = UserDefaults.standard.bool(forKey: "ss")
+    @State private var isDataSelected: Bool = UserDefaults.standard.bool(forKey: "isDataSelected")
+    
     
     var body: some Scene {
         WindowGroup {
-            if a {
-                MainView(selectedType: userData.userType ?? .greenOnions)
-                    .modelContainer(for: [Memo.self])
-                    .environmentObject(userData)
+            if isDataSelected {
+                MainView()
+                    .modelContainer(for: [UserInfo.self])
             } else {
                 DataSelectView()
-                    .modelContainer(for: [Memo.self])
-                    .environmentObject(userData)
+                    .modelContainer(for: [UserInfo.self])
+                    
             }
             
         }
+        
     }
 }

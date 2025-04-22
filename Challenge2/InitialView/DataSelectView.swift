@@ -10,15 +10,12 @@ import SwiftUI
 
 
 struct DataSelectView: View {
-    @EnvironmentObject var userData: UserData
-    
-    
     var body: some View {
         
         NavigationStack {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2), spacing: 12, content: {
                 ForEach(myType.allCases, id: \.self) { data in
-                    NavigationLink(destination: NameSetView(selectedType: data, userData: .init())) {
+                    NavigationLink(destination: NameSetView(selectedType: data)) {
                         contentsCard(data: data)
                     }
                 }
@@ -61,5 +58,4 @@ struct DataSelectView: View {
 
 #Preview {
     DataSelectView()
-        .environmentObject(UserData())
 }

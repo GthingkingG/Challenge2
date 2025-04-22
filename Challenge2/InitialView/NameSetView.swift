@@ -6,21 +6,26 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct NameSetView: View {
-    let selectedType: myType
-    @EnvironmentObject var userData: UserData
-    @State var name: String = ""
+    @Environment(\.modelContext) private var modelContext
     
+    @State var name: String = ""
+    var selectedType: myType
    
     
     var body: some View {
         NavigationStack {
             VStack {
-                NavigationLink(destination: MainView(selectedType: selectedType)) {
+                NavigationLink(destination: MainView()) {
                     Text("Done")
                 }
+                .offset(x: 140 ,y: 40)
+                .padding()
                 
+                
+                Spacer().frame(height: 140)
                 
                 ZStack {
                     Circle()
@@ -34,7 +39,8 @@ struct NameSetView: View {
                         .minimumScaleFactor(0.5)
                         .frame(width: 200)
                 }
-                .padding(.horizontal, 32)
+                .padding(24)
+                
                 
                 
                 HStack {
@@ -49,19 +55,29 @@ struct NameSetView: View {
                         .cornerRadius(16)
                 )
                 .padding()
+                Spacer()
             }
         }
         .navigationTitle("NameSet")
         .onDisappear() {
-            userData.userName = name
-            userData.userType = selectedType
-            UserDefaults.standard.set(true, forKey: "ss")
+            saveInfo()
+            UserDefaults.standard.set(true, forKey: "isDataSelected")
+            
         }
         
+    }
+    
+    private func saveInfo() {
+        let newUser = UserInfo(userName: name, userType: selectedType, memos: [])
+            modelContext.insert(newUser)
+        do {
+            try modelContext.save()
+        } catch {
+            print("Error: \(error.localizedDescription)")
+        }
     }
 }
 
 #Preview {
-    NameSetView(selectedType: .greenOnions)
-        .environmentObject(UserData())
+    NameSetView(selectedType: .basil)
 }

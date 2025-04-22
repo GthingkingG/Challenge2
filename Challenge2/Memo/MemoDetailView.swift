@@ -401,6 +401,7 @@ struct MemoDetailView: View {
         }
     }
     
+    //이미지 저장_SwiftData
     private func saveImage(data: Data) {
         let fileName = "Img_\(UUID().uuidString).jpg"
         guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) else { return }
@@ -417,6 +418,8 @@ struct MemoDetailView: View {
         }
     }
     
+    
+    //이미지 삭제_SwiftData
     private func deleteAttachment(_ attachment: Attachment) {
         let fileURL = URL(fileURLWithPath: attachment.fileURL)
         try? FileManager.default.removeItem(at: fileURL)

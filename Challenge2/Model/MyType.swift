@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-enum myType: String, CaseIterable {
+enum myType: String, Codable ,CaseIterable {
     case greenOnions, redLettuce, basil, perillaLeaves, cherryTomatoes, kidneyBeans, peas, cucumbers
     
     var typeName: String {

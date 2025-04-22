@@ -14,8 +14,8 @@
             filePath = "Challenge2/Memo/Memo.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "12"
-            endingLineNumber = "12"
+            startingLineNumber = "27"
+            endingLineNumber = "27"
             landmarkName = "Memo"
             landmarkType = "3">
          </BreakpointContent>
@@ -82,6 +82,52 @@
             endingLineNumber = "116"
             landmarkName = "body"
             landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5EE18AD7-0542-4480-BC8B-A93FEFE366B6"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../var/folders/04/c50r28m12n9_y93vy751tg900000gp/T/swift-generated-sources/@__swiftmacro_10Challenge28MainViewV4name33_2A76B392F558538B2CA8A7C2737D757DLL5QueryfMp_.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1"
+            endingLineNumber = "1"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5DD760F0-71A1-4218-90C5-F4A144A68C09"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../var/folders/04/c50r28m12n9_y93vy751tg900000gp/T/swift-generated-sources/@__swiftmacro_10Challenge28UserInfoC8userType18_PersistedPropertyfMa_.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1"
+            endingLineNumber = "1"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E07186E0-6902-469E-B815-7D118C2B37FD"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../var/folders/04/c50r28m12n9_y93vy751tg900000gp/T/swift-generated-sources/@__swiftmacro_10Challenge211ProfileViewV8userInfo33_D7DB603371BA212D571789CA18D30E3CLL5QueryfMp_.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1"
+            endingLineNumber = "1">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

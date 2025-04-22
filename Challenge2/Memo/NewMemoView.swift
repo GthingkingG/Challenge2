@@ -66,9 +66,10 @@ struct NewMemoView: View {
             title
         
         do {
-            let newMemo = Memo(title: finalTitle, content: content, createdAt: now, modifiedAt: now, customDate: now)
             
-            modelContext.insert(newMemo)
+            
+            let newMemo = Memo(title: finalTitle, content: content, createdAt: now, modifiedAt: now, customDate: now)
+                modelContext.insert(newMemo)
             try modelContext.save()
         }
         catch {
