@@ -9,8 +9,9 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var UserData: UserData
+    @EnvironmentObject var userData: UserData
     
+    @State var isCard: Bool = false
     let selectedType: myType
     
     var body: some View {
@@ -36,60 +37,75 @@ struct ProfileView: View {
             
             Spacer()
             
-            Text(UserData.userName)
-                .font(.largeTitle.bold())
-                .foregroundStyle(.white)
-                .background(
-                    Circle()
-                        .fill(selectedType.typeColor)
-                        .opacity(0.3)
-                        .frame(width: 100, height: 100)
-                        .shadow(radius: 8)
-                        
-                )
+            ZStack {
+                Circle()
+                    .fill(selectedType.typeColor)
+                    .opacity(0.5)
+                    .frame(width: 160, height: 160)
+                Text(userData.userName)
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .frame(width: 120)
+            }
+            .padding(.horizontal, 32)
             
             Spacer()
-            VStack {
-                ZStack{
-                    Circle()
-                        .fill(selectedType.typeColor.opacity(0.7))
-                        .frame(width: 80, height: 80)
+            Button {
+                isCard.toggle()
+            } label: {
+                if isCard {
+                    VStack {
+                        ZStack{
+                            Circle()
+                                .fill(selectedType.typeColor.opacity(0.7))
+                                .frame(width: 160, height: 160)
 
-                    Image("\(selectedType.rawValue)")
-                        .resizable()
-                        .frame(width: 60, height: 60)
-                        .scaledToFill()
-                }
-                .padding(.top, 18)
-                .padding(.bottom, 6)
-                
-                Text(selectedType.rawValue)
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.black)
-                    .padding(.bottom, 16)
-                    .lineLimit(1)
-                
-            }
-            .frame(maxWidth: 200, maxHeight: 140)
-            .background {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.gray.opacity(0.15))
-            }
-            ZStack {
-                Rectangle()
-                    .fill(.white)
+                            Image("\(selectedType.rawValue)")
+                                .resizable()
+                                .frame(width: 120, height: 120)
+                                .scaledToFill()
+                        }
+                        .padding(.top, 18)
+                        .padding(.bottom, 6)
+                        
+                        Text(selectedType.rawValue)
+                            .font(.largeTitle.bold())
+                            .foregroundStyle(.black)
+                            .padding(.bottom, 16)
+                            .lineLimit(1)
+                        
+                    }
                     .frame(width: 370, height: 252)
-                    .cornerRadius(16)
-                VStack(alignment: .leading) {
-                    Text("의미: \(selectedType.typeMeans)")
-                        .padding(.leading, 4)
-                    Spacer().frame(height: 44)
-                    Text("설명: \(selectedType.typeDetail)")
-                        .frame(width: 320)
+                    .background {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(selectedType.typeColor.opacity(0.7))
+                            .stroke(Color.white, lineWidth: 4)
+                            
+                    }
+                    
+                } else {
+                    ZStack {
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 370, height: 252)
+                            .cornerRadius(16)
+                        VStack(alignment: .leading) {
+                            Text("타입: \(selectedType.typeName)")
+                            Divider().frame(width: 320, height: 12)
+                            Text("의미: \(selectedType.typeMeans)")
+                            Divider().frame(width: 320, height: 12)
+                            Text("설명: \(selectedType.typeDetail)")
+                                .frame(width: 320)
+                        }
+                        .font(.title2)
+                        .foregroundStyle(.black)
+                        
+                    }
                 }
-                .font(.title2)
-                
             }
+            
             
                 
                 

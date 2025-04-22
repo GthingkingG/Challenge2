@@ -41,20 +41,25 @@ struct MainView: View {
                 NavigationLink(destination: ProfileView(selectedType: selectedType)) {
                         HStack {
                             Spacer()
-                            Text(userData.userName)
-                                .foregroundStyle(.white)
-                                .padding(40)
-                                .background(
-                                    Circle()
-                                        .fill(selectedType.typeColor)
-                                        .opacity(0.3)
-                                        .frame(width: 45, height: 45)
-                                )
+                            ZStack {
+                                Circle()
+                                    .fill(selectedType.typeColor)
+                                    .opacity(0.5)
+                                    .frame(width: 64, height: 64)
+                                Text(userData.userName)
+                                    .font(.title2.bold())
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.5)
+                                    .frame(width: 60)
+                            }
+                            .padding(.horizontal, 32)
+                            .padding(.vertical, 16)
                                 
                         }
                     }
                 Spacer()
-                Image("\(level.imageName)")
+                Image(level.rawValue > 2 ? "\(level.imageName)_\(selectedType.rawValue)" : level.imageName)
                     .resizable()
                     .scaledToFill()
                     .frame(width :160, height: 160)

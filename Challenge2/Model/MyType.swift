@@ -9,6 +9,27 @@ import SwiftUI
 enum myType: String, CaseIterable {
     case greenOnions, redLettuce, basil, perillaLeaves, cherryTomatoes, kidneyBeans, peas, cucumbers
     
+    var typeName: String {
+        switch self {
+        case .greenOnions:
+            return "대파"
+        case .redLettuce:
+            return "적상추"
+        case .basil:
+            return "바질"
+        case .perillaLeaves:
+            return "꺳잎"
+        case .cherryTomatoes:
+            return "방울토마토"
+        case .kidneyBeans:
+            return "강낭콩"
+        case .peas:
+            return "완두콩"
+        case .cucumbers:
+            return "오이"
+        }
+    }
+    
     var typeMeans: String {
         switch self {
         case .greenOnions:

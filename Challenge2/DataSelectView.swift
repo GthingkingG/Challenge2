@@ -43,7 +43,7 @@ struct DataSelectView: View {
                 .padding(.top, 18)
                 .padding(.bottom, 6)
                 
-                Text(data.rawValue)
+                Text(data.typeName)
                     .font(.subheadline.bold())
                     .foregroundStyle(.black)
                     .padding(.bottom, 16)

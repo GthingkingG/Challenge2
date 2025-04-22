@@ -22,17 +22,19 @@ struct NameSetView: View {
                 }
                 
                 
-                Text(name)
-                    .font(.title.bold())
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .frame(width: 240, height: 240)
-                    .background(
-                        Circle()
-                            .fill(selectedType.typeColor)
-                            .opacity(0.3)
-                    )
-                    .padding()
+                ZStack {
+                    Circle()
+                        .fill(selectedType.typeColor)
+                        .opacity(0.5)
+                        .frame(width: 240, height: 240)
+                    Text(name)
+                        .font(.largeTitle.bold())
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .frame(width: 200)
+                }
+                .padding(.horizontal, 32)
                 
                 
                 HStack {
@@ -52,10 +54,8 @@ struct NameSetView: View {
         .navigationTitle("NameSet")
         .onDisappear() {
             userData.userName = name
-//            userData.isUserRegistered = true
-//            UserDefaults.standard.bool(forKey: "ss")
+            userData.userType = selectedType
             UserDefaults.standard.set(true, forKey: "ss")
-//            UserDefaults.setValue(true, forKey: "ss")
         }
         
     }
