@@ -15,11 +15,13 @@ struct NewMemoView: View {
     @State private var title = ""
     @State private var content = ""
     
+    //키보드 포커스 맞추기 위한 변수
     @FocusState private var isTitleFocused: Bool
     @FocusState private var isContentFocused: Bool
     var body: some View {
         NavigationStack {
             VStack {
+                //제목
                 TextField("Title", text: $title)
                     .font(.largeTitle.bold())
                     .padding(.horizontal)
@@ -29,6 +31,7 @@ struct NewMemoView: View {
                         isContentFocused = true
                     }
                 
+                //본문
                 TextEditor(text: $content)
                     .cornerRadius(8)
                     .padding(.horizontal)
@@ -54,10 +57,12 @@ struct NewMemoView: View {
             }
         }
         .onAppear {
+            //바로 제목으로 입력 가능
             isTitleFocused = true
         }
     }
     
+    //메모 파일을 SwiftData에 저장
     private func saveMemo() {
         let now = Date()
         // 제목이 비어있으면 내용의 첫 부분을 제목으로 사용

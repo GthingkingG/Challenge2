@@ -11,7 +11,7 @@ import SwiftUI
 
 struct DataSelectView: View {
     var body: some View {
-        
+        //타입카드_네비게이션링크
         NavigationStack {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2), spacing: 12, content: {
                 ForEach(myType.allCases, id: \.self) { data in

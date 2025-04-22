@@ -16,17 +16,20 @@ struct ProfileView: View {
     @State var isCard: Bool = false
     
     var body: some View {
+        //
         let userInfo: UserInfo = userInfos.first ?? UserInfo.init(userName: "Name", userType: .greenOnions)
         
         VStack {
             VStack(alignment: .leading) {
                 HStack {
                     Spacer()
+                    //창 닫기
                     Button {
                         dismiss()
                     } label: {
                         Text("Done")
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 24)
+                            .font(.title3)
                     }
                     
                 }
@@ -38,6 +41,7 @@ struct ProfileView: View {
             
             Spacer()
             
+            //프로필
             ZStack {
                 Circle()
                     .fill(userInfo.userType.typeColor)
@@ -57,6 +61,7 @@ struct ProfileView: View {
                 isCard.toggle()
             } label: {
                 if isCard {
+                    //타입 카드
                     VStack {
                         ZStack{
                             Circle()
@@ -86,7 +91,7 @@ struct ProfileView: View {
                             
                     }
                     
-                } else {
+                } else { //타입설명
                     ZStack {
                         Rectangle()
                             .fill(.white)
@@ -112,7 +117,7 @@ struct ProfileView: View {
                 
             Spacer()
         }
-        .navigationBarBackButtonHidden(true)
+        .navigationBarBackButtonHidden(true)//뒤로가기버튼 삭제
         .background(Color(.systemGray6))
     }
 }

@@ -58,8 +58,6 @@ class Attachment: Identifiable {
     var fileURL: String
     var type: String
     
-//    @Relationship(deleteRule: .cascade, inverse: \Memo.attachments)
-//    var memo: Memo?
     
     init(fileName: String, fileURL: String, type: String) {
         self.fileName = fileName

@@ -11,23 +11,23 @@ struct TextFormattingPanel: View {
     @Binding var isBold: Bool
     @Binding var isItalic: Bool
     @Binding var isUnderlined: Bool
-    @Binding var isStrikeThrough: Bool
+    @Binding var isStrikeThrough: Bool//중간줄
     @Binding var selectedColor: Color
     @Binding var textStyle: Font.TextStyle
     @Binding var content: String
     
-    
+    //텍스트 포맷 창 닫기
     var onClose: () -> Void
     
-    
+    //색 변수
     private let colors: [Color] = [.black, .purple, .pink, .orange, .mint, .blue]
     private let colorNames = ["Black", "Purple", "Pink", "Orange", "Mint", "Blue"]
     
-    
+    //글씨크기 변수
     private let styles: [(style: Font.TextStyle, name: String)] = [
         (.title, "Title"),
-        (.headline, "Subtitle"),
-        (.subheadline, "Subheadling"),
+        (.title2, "Subtitle"),
+        (.title3, "Subhead"),
         (.body, "Body")
     ]
     
@@ -49,6 +49,7 @@ struct TextFormattingPanel: View {
                 
             }
             .padding(.horizontal, 40)
+            .padding(.bottom, 6)
             
             //글씨크기
             HStack {
@@ -90,6 +91,7 @@ struct TextFormattingPanel: View {
                 
                 Spacer()
                 
+                //글씨 색
                 HStack(spacing: 2) {
                     Button(action: { showingColorPicker.toggle() }) {
                         Image(systemName: "pencil")
@@ -139,6 +141,7 @@ struct TextFormattingPanel: View {
             //리스트 형식
             HStack {
                 HStack {
+                    //점 리스트
                     Button(action: { applyListStyle(symbol: "• ") }) {
                         Image(systemName: "list.bullet")
                     }
@@ -146,6 +149,7 @@ struct TextFormattingPanel: View {
                     
                     Divider().frame(height: 24)
                     
+                    //숫자 리스트
                     Button(action: { applyListStyle(symbol: "1. ") }) {
                         Image(systemName: "list.number")
                     }
@@ -153,6 +157,7 @@ struct TextFormattingPanel: View {
                     
                     Divider().frame(height: 24)
                     
+                    //대시 리스트
                     Button(action: { applyListStyle(symbol: "- ") }) {
                         Image(systemName: "list.dash")
                     }
@@ -165,6 +170,7 @@ struct TextFormattingPanel: View {
                 Spacer()
                 
                 HStack {
+                    //왼쪽 Tab(아직 구현 X)
                     Button(action: { applyIndent(increase: false) }) {
                         Image(systemName: "decrease.indent")
                             .foregroundStyle(Color.gray)
@@ -173,7 +179,7 @@ struct TextFormattingPanel: View {
                     
                     Divider().frame(height: 24)
                     
-                    
+                    //오른쪽 Tab
                     Button(action: { applyIndent(increase: true) }) {
                         Image(systemName: "increase.indent")
                     }
@@ -183,6 +189,7 @@ struct TextFormattingPanel: View {
                 
                 Spacer()
                 
+                //인용구 추가
                 Button(action: appplyQuote) {
                     Image(systemName: "text.quote")
                 }
@@ -206,6 +213,7 @@ struct TextFormattingPanel: View {
         .cornerRadius(16)
     }
     
+    //리스트 적용 함수
     private func applyListStyle(symbol: String) {
         let lines = content.components(separatedBy: "\n")
         let newLines = lines.map { line in
@@ -214,6 +222,7 @@ struct TextFormattingPanel: View {
         content = newLines.joined(separator: "\n")
     }
     
+    //간격 적용 함수
     private func applyIndent(increase: Bool) {
         let indent = increase ? "    " : ""
         let lines = content.components(separatedBy: "\n")
@@ -221,6 +230,7 @@ struct TextFormattingPanel: View {
         content = newLines.joined(separator: "\n")
     }
     
+    //인용구 적용 함수
     private func appplyQuote() {
         let lines = content.components(separatedBy: "\n")
         let newLines = lines.map { "> " + $0 }
@@ -228,6 +238,7 @@ struct TextFormattingPanel: View {
     }
 }
 
+//버튼 스타일 재사용
 struct FormatButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

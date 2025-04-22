@@ -33,6 +33,7 @@ struct AttachmentThumbnailView: View {
                     )
             }
             if isEditing {
+                //첨부파일_이미지 삭제 버튼
                 Button(action: onDelete) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.red)
