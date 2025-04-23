@@ -75,7 +75,7 @@ struct ContentView: View {
                 }
                 .navigationTitle("Reflection")
                 .navigationBarTitleDisplayMode(.large)//네비게이션 제목 형식 고정
-                .searchable(text: $searchText, prompt: "Searㅈch")//검색가능하도록
+                .searchable(text: $searchText, prompt: "Search")//검색가능하도록
                 .sheet(isPresented: $isAddingNewMemo) {
                     //NewMemoView가 시트로 올라오도록 설정
                     NewMemoView()

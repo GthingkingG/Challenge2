@@ -12,9 +12,9 @@ import Foundation
 class UserInfo {
     var userName: String
     var userType: myType
-    var memos: [Memo]
+    var memos: [Memo]?
     
-    init(userName: String, userType: myType, memos: [Memo] = []) {
+    init(userName: String, userType: myType, memos: [Memo]? = []) {
         self.userName = userName
         self.userType = userType
         self.memos = memos

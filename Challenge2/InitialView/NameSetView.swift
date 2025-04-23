@@ -13,17 +13,13 @@ struct NameSetView: View {
     
     @State var name: String = ""
     var selectedType: myType
-   
+    
     
     var body: some View {
         NavigationStack {
             //확인버튼_네비게이션링크
             VStack {
-                NavigationLink(destination: MainView()) {
-                    Text("Done")
-                }
-                .offset(x: 140 ,y: 40)//뷰의 위치 설정
-                .padding()
+                
                 
                 
                 Spacer().frame(height: 140)
@@ -61,28 +57,36 @@ struct NameSetView: View {
             }
         }
         .navigationTitle("NameSet")
-        .onDisappear() {
-            //이 창이 닫히면서 실행
-            
-            //이름과 전달받은 타입 SwiftData에 저장
-            saveInfo()
-            
-            //UserDefaults에 데이터 선택 기록 저장
-            UserDefaults.standard.set(true, forKey: "isDataSelected")
-
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink(destination: MainView()) {
+                    Text("Done")
+                }
+                .padding()
+                .simultaneousGesture(TapGesture().onEnded {
+                    //이름과 전달받은 타입 SwiftData에 저장
+                    saveInfo()
+                    
+                    //UserDefaults에 데이터 선택 기록 저장
+                    UserDefaults.standard.set(true, forKey: "isDataSelected")
+                })
+            }
         }
+    }
+    
         
-    }
-    //새로운 UserInfo생성자를 만들어서, newUser에 저장하고, modelContext배열에 인서트한 후, 저장
-    private func saveInfo() {
-        let newUser = UserInfo(userName: name, userType: selectedType, memos: [])
+        
+        
+        //새로운 UserInfo생성자를 만들어서, newUser에 저장하고, modelContext배열에 인서트한 후, 저장
+        private func saveInfo() {
+            let newUser = UserInfo(userName: name, userType: selectedType)
             modelContext.insert(newUser)
-        do {
-            try modelContext.save()
-        } catch {
-            print("Error: \(error.localizedDescription)")
+            do {
+                try modelContext.save()
+            } catch {
+                print("Error: \(error.localizedDescription)")
+            }
         }
-    }
 }
 
 #Preview {
